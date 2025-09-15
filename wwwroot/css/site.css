@@ -1,0 +1,16 @@
+/* Basic styling only */
+html {
+  font-size: 14px;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}

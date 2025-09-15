@@ -1,0 +1,171 @@
+@model PlacementManagementSystem.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Register</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post" id="registerForm">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+            
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="form-label">First Name</label>
+                                    <input asp-for="FirstName" class="form-control" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="form-label">Last Name</label>
+                                    <input asp-for="LastName" class="form-control" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Password" class="form-label">Password</label>
+                                    <input asp-for="Password" class="form-control" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                                    <input asp-for="ConfirmPassword" class="form-control" />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="UserType" class="form-label">I am a...</label>
+                            <select asp-for="UserType" class="form-control" id="userTypeSelect">
+                                <option value="">Select your role</option>
+                                <option value="1">Student</option>
+                                <option value="2">Company</option>
+                            </select>
+                            <span asp-validation-for="UserType" class="text-danger"></span>
+                        </div>
+
+                        <!-- Student specific fields -->
+                        <div id="studentFields" style="display: none;">
+                            <h4>Student Information</h4>
+                            
+                            <div class="form-group">
+                                <label asp-for="CollegeName" class="form-label">College Name</label>
+                                <input asp-for="CollegeName" class="form-control" />
+                                <span asp-validation-for="CollegeName" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="StudentId" class="form-label">Student ID</label>
+                                        <input asp-for="StudentId" class="form-control" />
+                                        <span asp-validation-for="StudentId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Department" class="form-label">Department</label>
+                                        <input asp-for="Department" class="form-control" />
+                                        <span asp-validation-for="Department" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Year" class="form-label">Academic Year</label>
+                                        <input asp-for="Year" class="form-control" />
+                                        <span asp-validation-for="Year" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="CGPA" class="form-label">CGPA</label>
+                                        <input asp-for="CGPA" class="form-control" />
+                                        <span asp-validation-for="CGPA" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company specific fields -->
+                        <div id="companyFields" style="display: none;">
+                            <h4>Company Information</h4>
+                            
+                            <div class="form-group">
+                                <label asp-for="CompanyName" class="form-label">Company Name</label>
+                                <input asp-for="CompanyName" class="form-control" />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Industry" class="form-label">Industry</label>
+                                <input asp-for="Industry" class="form-control" />
+                                <span asp-validation-for="Industry" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Website" class="form-label">Website</label>
+                                <input asp-for="Website" class="form-control" />
+                                <span asp-validation-for="Website" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="form-label">Company Description</label>
+                                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // User type selection functionality
+        document.getElementById('userTypeSelect').addEventListener('change', function() {
+            var userType = this.value;
+            var studentFields = document.getElementById('studentFields');
+            var companyFields = document.getElementById('companyFields');
+            
+            studentFields.style.display = 'none';
+            companyFields.style.display = 'none';
+            
+            if (userType === '1') {
+                studentFields.style.display = 'block';
+            } else if (userType === '2') {
+                companyFields.style.display = 'block';
+            }
+        });
+    </script>
+}
