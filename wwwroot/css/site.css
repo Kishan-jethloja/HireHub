@@ -1,16 +1,49 @@
-/* Basic styling only */
-html {
-  font-size: 14px;
+/* Minimal white theme with blue accents */
+
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #ffffff;
+  --bg-soft: #f9fafb;
 }
 
-body {
-  margin-bottom: 60px;
-}
+html { font-size: 16px; }
+body { background: var(--bg); color: var(--text); margin: 0; }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-}
+.container { max-width: 1140px; }
+
+/* Navbar */
+.navbar { border-bottom: 1px solid var(--border); }
+.navbar .nav-link { color: #374151; }
+.navbar .nav-link:hover { color: var(--primary); }
+.navbar-brand { font-weight: 700; letter-spacing: -.02em; }
+
+/* Buttons */
+.btn-primary { background-color: var(--primary); border-color: var(--primary); }
+.btn-primary:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); }
+.btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+.btn-outline-primary:hover { color: #fff; background-color: var(--primary); border-color: var(--primary); }
+
+/* Cards */
+.card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+.card-header { background: var(--bg-soft); border-bottom: 1px solid var(--border); }
+
+/* Forms */
+.form-control, .form-select, .input-group .form-control { border: 1px solid var(--border); }
+.form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(37,99,235,.15); }
+.form-label { font-weight: 500; }
+
+/* Utilities */
+.bg-light { background-color: var(--bg-soft)!important; }
+.mt-4 { margin-top: 1.5rem!important; }
+.mb-4 { margin-bottom: 1.5rem!important; }
+.py-4 { padding-top: 1.5rem!important; padding-bottom: 1.5rem!important; }
+.pb-3 { padding-bottom: 1rem!important; }
+
+/* Tables (for lists) */
+.table { background: var(--bg); }
+.table thead th { border-bottom: 2px solid var(--border); }
+.table td, .table th { border-top: 1px solid var(--border); }
