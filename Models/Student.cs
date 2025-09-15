@@ -11,6 +11,10 @@ namespace PlacementManagementSystem.Models
         public ApplicationUser User { get; set; }
 
         [Required]
+        [StringLength(100)]
+        public string CollegeName { get; set; }
+
+        [Required]
         [StringLength(50)]
         public string StudentId { get; set; }
 

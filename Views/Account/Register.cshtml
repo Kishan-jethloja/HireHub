@@ -13,51 +13,52 @@
                 </div>
                 <div class="card-body">
                     <form asp-action="Register" method="post" id="registerForm">
+                        @Html.AntiForgeryToken()
                         <div asp-validation-summary="All" class="text-danger"></div>
             
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="FirstName" class="form-label">First Name</label>
-                                    <input asp-for="FirstName" class="form-control" />
+                                    <label asp-for="FirstName" class="form-label"></label>
+                                    <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
                                     <span asp-validation-for="FirstName" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="LastName" class="form-label">Last Name</label>
-                                    <input asp-for="LastName" class="form-control" />
+                                    <label asp-for="LastName" class="form-label"></label>
+                                    <input asp-for="LastName" class="form-control" autocomplete="family-name" />
                                     <span asp-validation-for="LastName" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label asp-for="Email" class="form-label">Email</label>
-                            <input asp-for="Email" class="form-control" />
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" autocomplete="email" />
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="Password" class="form-label">Password</label>
-                                    <input asp-for="Password" class="form-control" />
+                                    <label asp-for="Password" class="form-label"></label>
+                                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
                                     <span asp-validation-for="Password" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-                                    <input asp-for="ConfirmPassword" class="form-control" />
+                                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                                    <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
                                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label asp-for="UserType" class="form-label">I am a...</label>
-                            <select asp-for="UserType" class="form-control" id="userTypeSelect">
+                            <label asp-for="UserType" class="form-label"></label>
+                            <select asp-for="UserType" class="form-control" id="userTypeSelect" autocomplete="organization-title">
                                 <option value="">Select your role</option>
                                 <option value="1">Student</option>
                                 <option value="2">Company</option>
@@ -70,23 +71,23 @@
                             <h4>Student Information</h4>
                             
                             <div class="form-group">
-                                <label asp-for="CollegeName" class="form-label">College Name</label>
-                                <input asp-for="CollegeName" class="form-control" />
+                                <label asp-for="CollegeName" class="form-label"></label>
+                                <input asp-for="CollegeName" class="form-control" autocomplete="organization" />
                                 <span asp-validation-for="CollegeName" class="text-danger"></span>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="StudentId" class="form-label">Student ID</label>
-                                        <input asp-for="StudentId" class="form-control" />
+                                        <label asp-for="StudentId" class="form-label"></label>
+                                        <input asp-for="StudentId" class="form-control" autocomplete="on" />
                                         <span asp-validation-for="StudentId" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="Department" class="form-label">Department</label>
-                                        <input asp-for="Department" class="form-control" />
+                                        <label asp-for="Department" class="form-label"></label>
+                                        <input asp-for="Department" class="form-control" autocomplete="organization-title" />
                                         <span asp-validation-for="Department" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -95,15 +96,15 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="Year" class="form-label">Academic Year</label>
-                                        <input asp-for="Year" class="form-control" />
+                                        <label asp-for="Year" class="form-label"></label>
+                                        <input asp-for="Year" class="form-control" autocomplete="on" />
                                         <span asp-validation-for="Year" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="CGPA" class="form-label">CGPA</label>
-                                        <input asp-for="CGPA" class="form-control" />
+                                        <label asp-for="CGPA" class="form-label"></label>
+                                        <input asp-for="CGPA" class="form-control" autocomplete="on" />
                                         <span asp-validation-for="CGPA" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -115,25 +116,25 @@
                             <h4>Company Information</h4>
                             
                             <div class="form-group">
-                                <label asp-for="CompanyName" class="form-label">Company Name</label>
-                                <input asp-for="CompanyName" class="form-control" />
+                                <label asp-for="CompanyName" class="form-label"></label>
+                                <input asp-for="CompanyName" class="form-control" autocomplete="organization" />
                                 <span asp-validation-for="CompanyName" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="Industry" class="form-label">Industry</label>
-                                <input asp-for="Industry" class="form-control" />
+                                <label asp-for="Industry" class="form-label"></label>
+                                <input asp-for="Industry" class="form-control" autocomplete="organization-title" />
                                 <span asp-validation-for="Industry" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="Website" class="form-label">Website</label>
-                                <input asp-for="Website" class="form-control" />
+                                <label asp-for="Website" class="form-label"></label>
+                                <input asp-for="Website" class="form-control" autocomplete="url" />
                                 <span asp-validation-for="Website" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="Description" class="form-label">Company Description</label>
+                                <label asp-for="Description" class="form-label"></label>
                                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                                 <span asp-validation-for="Description" class="text-danger"></span>
                             </div>
