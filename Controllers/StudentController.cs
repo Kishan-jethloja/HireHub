@@ -24,6 +24,101 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
+		public async Task<IActionResult> Apply(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Student)
+			{
+				return Forbid();
+			}
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+			ViewBag.Job = job;
+			var existing = _db.Applications.FirstOrDefault(a => a.JobPostingId == id && a.StudentUserId == user.Id);
+			if (existing != null)
+			{
+				return View(existing);
+			}
+			return View(new Application());
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Apply(int id, Application model, IFormFile resumeFile)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Student)
+			{
+				return Forbid();
+			}
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			ModelState.Remove("StudentUserId");
+			ModelState.Remove("JobPostingId");
+			if (!model.TermsAccepted)
+			{
+				ModelState.AddModelError("TermsAccepted", "You must accept the terms and conditions.");
+			}
+
+			// Upsert: create new or update existing application for this job
+			var existing = _db.Applications.FirstOrDefault(a => a.JobPostingId == job.Id && a.StudentUserId == user.Id);
+			if (!ModelState.IsValid)
+			{
+				ViewBag.Job = job;
+				return View(model);
+			}
+
+			Application application;
+			if (existing == null)
+			{
+				application = new Application
+				{
+					JobPostingId = job.Id,
+					StudentUserId = user.Id
+				};
+				_db.Applications.Add(application);
+			}
+			else
+			{
+				application = existing;
+			}
+
+			application.ApplicantName = model.ApplicantName;
+			application.ApplicantEmail = model.ApplicantEmail;
+			application.CollegeId = model.CollegeId;
+			application.LinkedInUrl = model.LinkedInUrl;
+			application.GithubUrl = model.GithubUrl;
+			application.Gender = model.Gender;
+			application.CoverLetter = model.CoverLetter;
+			application.TermsAccepted = model.TermsAccepted;
+
+			if (resumeFile != null && resumeFile.Length > 0)
+			{
+				var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "applications");
+				if (!Directory.Exists(uploadsDir))
+				{
+					Directory.CreateDirectory(uploadsDir);
+				}
+				var fileName = $"app_{user.Id}_{Guid.NewGuid():N}.pdf";
+				var filePath = Path.Combine(uploadsDir, fileName);
+				using (var stream = new FileStream(filePath, FileMode.Create))
+				{
+					await resumeFile.CopyToAsync(stream);
+				}
+				application.ResumePath = $"/uploads/applications/{fileName}";
+			}
+
+			await _db.SaveChangesAsync();
+			TempData["AppSuccess"] = "Application submitted.";
+			return RedirectToAction("Jobs");
+		}
 		public async Task<IActionResult> Jobs()
 		{
 			var user = await _userManager.GetUserAsync(User);
@@ -44,6 +139,12 @@ namespace PlacementManagementSystem.Controllers
 				.Where(j => j.CollegeName == student.CollegeName && (j.ApplyByUtc == null || j.ApplyByUtc >= nowUtc))
 				.OrderByDescending(j => j.CreatedAtUtc)
 				.ToList();
+
+			var appliedJobIds = _db.Applications
+				.Where(a => a.StudentUserId == user.Id)
+				.Select(a => a.JobPostingId)
+				.ToHashSet();
+			ViewBag.AppliedJobIds = appliedJobIds;
 
 			return View(jobs);
 		}

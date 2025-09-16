@@ -15,6 +15,7 @@ namespace PlacementManagementSystem.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<JobPosting> JobPostings { get; set; }
+        public DbSet<Application> Applications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -57,6 +58,22 @@ namespace PlacementManagementSystem.Data
             builder.Entity<JobPosting>()
                 .Property(j => j.CompanyUserId)
                 .IsRequired();
+
+            builder.Entity<Application>()
+                .HasOne(a => a.JobPosting)
+                .WithMany()
+                .HasForeignKey(a => a.JobPostingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Application>()
+                .HasOne(a => a.StudentUser)
+                .WithMany()
+                .HasForeignKey(a => a.StudentUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Application>()
+                .HasIndex(a => new { a.JobPostingId, a.StudentUserId })
+                .IsUnique();
         }
     }
 }

@@ -61,5 +61,53 @@ namespace PlacementManagementSystem.Controllers
 				.ToList();
 			return View(jobs);
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> Applications(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id && j.CompanyUserId == user.Id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			var applications = _db.Applications
+				.Where(a => a.JobPostingId == id)
+				.OrderByDescending(a => a.CreatedAtUtc)
+				.ToList();
+
+			ViewBag.Job = job;
+			return View(applications);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> ApplicationDetails(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var app = _db.Applications.FirstOrDefault(a => a.Id == id);
+			if (app == null)
+			{
+				return NotFound();
+			}
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == app.JobPostingId);
+			if (job == null || job.CompanyUserId != user.Id)
+			{
+				return Forbid();
+			}
+
+			ViewBag.Job = job;
+			return View(app);
+		}
 	}
 }

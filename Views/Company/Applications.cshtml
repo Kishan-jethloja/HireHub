@@ -1,0 +1,31 @@
+@model IEnumerable<PlacementManagementSystem.Models.Application>
+@{
+	ViewData["Title"] = "Applications";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h2 class="mb-0">Applications - @ViewBag.Job?.Title</h2>
+	<a class="btn btn-outline-primary" asp-action="MyJobs">Back to My Jobs</a>
+</div>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info">No applications yet.</div>
+}
+else
+{
+	<div class="list-group">
+		@foreach (var a in Model)
+		{
+			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" asp-action="ApplicationDetails" asp-route-id="@a.Id">
+				<span>
+					<strong>@a.ApplicantName</strong>
+					<span class="text-muted ml-2">(College ID: @a.CollegeId)</span>
+				</span>
+				<small class="text-muted">@a.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
+			</a>
+		}
+	</div>
+}
+
+

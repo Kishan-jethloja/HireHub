@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlacementManagementSystem.Data;
 
 namespace PlacementManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250916132615_OnSiteApplications_RequiredFields")]
+    partial class OnSiteApplications_RequiredFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,10 +213,9 @@ namespace PlacementManagementSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentUserId");
+                    b.HasIndex("JobPostingId");
 
-                    b.HasIndex("JobPostingId", "StudentUserId")
-                        .IsUnique();
+                    b.HasIndex("StudentUserId");
 
                     b.ToTable("Applications");
                 });
