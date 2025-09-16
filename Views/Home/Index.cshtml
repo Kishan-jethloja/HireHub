@@ -1,14 +1,75 @@
+@using PlacementManagementSystem.Models
 @{
     ViewData["Title"] = "HireHub";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to HireHub</h1>
-    <p>Empowering Students & Companies</p>
-    <p>Connect talented students with leading companies through our comprehensive placement management platform.</p>
-    
-    <div class="mt-4">
-        <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Get Started</a>
-        <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h2 class="mb-0">Dashboard</h2>
+                <p class="text-muted">Quick links based on your role.</p>
+            </div>
+        </div>
+        <div class="row">
+            @* Company shortcuts *@
+            @if (User.HasClaim("UserType", ((int)UserType.Company).ToString()))
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Post a Job/Internship</h5>
+                            <p class="card-text">Create a new opening and attach your Google Form.</p>
+                            <a class="btn btn-primary" asp-controller="Company" asp-action="CreateJob">Create Job</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">My Job Posts</h5>
+                            <p class="card-text">View and manage your job/internship postings.</p>
+                            <a class="btn btn-outline-primary" asp-controller="Company" asp-action="MyJobs">View Jobs</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            @* Student shortcuts *@
+            else
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Browse Jobs</h5>
+                            <p class="card-text">Explore internships and full-time roles.</p>
+                            <a class="btn btn-primary" asp-controller="Company" asp-action="MyJobs">Jobs</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Give Feedback</h5>
+                            <p class="card-text">Share your experience with a company or college.</p>
+                            <a class="btn btn-outline-primary" asp-controller="Home" asp-action="Feedback">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4">Welcome to HireHub</h1>
+        <p>Empowering Students & Companies</p>
+        <p>Connect talented students with leading companies through our comprehensive placement management platform.</p>
+        
+        <div class="mt-4">
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Get Started</a>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
+        </div>
+    </div>
+}

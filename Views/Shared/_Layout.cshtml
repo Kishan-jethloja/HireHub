@@ -22,9 +22,9 @@
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="#students">Students</a></li>
                         <li class="nav-item"><a class="nav-link" href="#companies">Companies</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#jobs">Jobs</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#reports">Reports</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="MyJobs">Jobs</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Feedback">Feedback</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     </ul>
                     <div class="navbar-nav">
                         <partial name="_LoginPartial" />

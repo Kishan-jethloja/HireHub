@@ -8,9 +8,8 @@
     <div class="auth-card fade-in">
         <div class="auth-header">
             <div class="text-center">
-                <i class="fas fa-shield-alt fa-3x mb-3"></i>
                 <h1 class="auth-title">Welcome Back</h1>
-                <p class="mb-0">Sign in to access your professional dashboard</p>
+                <p class="mb-0">Sign in to access your dashboard</p>
             </div>
         </div>
         <div class="auth-body">
@@ -25,55 +24,36 @@
                 <div asp-validation-summary="All" class="validation-summary-errors"></div>
                 
                 <div class="form-group">
-                    <label asp-for="Email" class="form-label">
-                        <i class="fas fa-envelope me-2"></i>Email Address
-                    </label>
-                    <input asp-for="Email" class="form-control" placeholder="Enter your professional email" autocomplete="email" />
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter your email" autocomplete="email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 
                 <div class="form-group">
-                    <label asp-for="Password" class="form-label">
-                        <i class="fas fa-lock me-2"></i>Password
-                    </label>
-                    <div class="input-group">
-                        <input asp-for="Password" class="form-control" placeholder="Enter your password" id="password" autocomplete="current-password" />
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" class="form-control" placeholder="Enter your password" id="password" autocomplete="current-password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 
                 <div class="form-group">
                     <div class="form-check">
                         <input asp-for="RememberMe" class="form-check-input" id="rememberMe" />
-                        <label asp-for="RememberMe" class="form-check-label">
-                            <i class="fas fa-check-circle me-2"></i>Keep me signed in
-                        </label>
+                        <label asp-for="RememberMe" class="form-check-label">Keep me signed in</label>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block btn-lg">
-                        <i class="fas fa-sign-in-alt me-2"></i>Sign In Securely
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">Sign In</button>
                 </div>
                 
                 <div class="text-center">
                     <p class="mb-3">
-                        <a href="#" class="text-primary">
-                            <i class="fas fa-key me-2"></i>Forgot your password?
-                        </a>
+                        <a href="#" class="text-primary">Forgot your password?</a>
                     </p>
                     <hr class="my-4">
                     <p class="mb-0">
                         New to our platform? 
-                        <a asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-primary font-weight-bold">
-                            <i class="fas fa-user-plus me-2"></i>Create your account
-                        </a>
+                        <a asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-primary font-weight-bold">Create your account</a>
                     </p>
                 </div>
             </form>
@@ -84,22 +64,6 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // Password toggle functionality
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const password = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                password.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-        
         // Form validation enhancement
         document.getElementById('account').addEventListener('submit', function(e) {
             const email = document.querySelector('input[name="Email"]').value;

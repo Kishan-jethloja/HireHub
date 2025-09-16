@@ -13,6 +13,8 @@ namespace PlacementManagementSystem.Data
 
         public DbSet<Student> Students { get; set; }
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<JobPosting> JobPostings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -24,11 +26,37 @@ namespace PlacementManagementSystem.Data
                 .HasForeignKey<Student>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<Student>()
+                .Property(s => s.CGPA)
+                .HasColumnType("decimal(3,2)");
+
             builder.Entity<Company>()
                 .HasOne(c => c.User)
                 .WithOne()
                 .HasForeignKey<Company>(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Feedback>()
+                .HasOne(f => f.AuthorUser)
+                .WithMany()
+                .HasForeignKey(f => f.AuthorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Feedback>()
+                .HasOne(f => f.TargetCompany)
+                .WithMany()
+                .HasForeignKey(f => f.TargetCompanyId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<JobPosting>()
+                .HasOne(j => j.CompanyUser)
+                .WithMany()
+                .HasForeignKey(j => j.CompanyUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<JobPosting>()
+                .Property(j => j.CompanyUserId)
+                .IsRequired();
         }
     }
 }

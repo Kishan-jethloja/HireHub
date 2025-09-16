@@ -1,0 +1,112 @@
+@model PlacementManagementSystem.Models.Feedback
+@using PlacementManagementSystem.Models
+@{
+	ViewData["Title"] = "Feedback";
+	var companies = ViewBag.Companies as System.Collections.IEnumerable;
+}
+
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header">
+					<h2 class="mb-0">Feedback</h2>
+				</div>
+				<div class="card-body">
+					@if (TempData["Success"] != null)
+					{
+						<div class="alert alert-success" role="alert">@TempData["Success"]</div>
+					}
+					<form asp-action="Feedback" method="post">
+						@Html.AntiForgeryToken()
+						<div asp-validation-summary="All" class="text-danger"></div>
+
+						@if (User.Identity.IsAuthenticated && User.IsInRole("")) { }
+
+						@if (User.Identity.IsAuthenticated)
+						{
+							// Student: select company
+							if (User.HasClaim("UserType", ((int)UserType.Student).ToString()))
+							{
+								<div class="form-group">
+									<label for="TargetCompanyId">Company</label>
+									<select asp-for="TargetCompanyId" class="form-control" id="TargetCompanyId">
+										<option value="">Select a company</option>
+										@foreach (dynamic c in companies)
+										{
+											<option value="@c.Id">@c.CompanyName</option>
+										}
+									</select>
+									<span asp-validation-for="TargetCompanyId" class="text-danger"></span>
+								</div>
+							}
+							// Company: enter college name
+							else
+							{
+								<div class="form-group">
+									<label asp-for="TargetCollegeName">College Name</label>
+									<input asp-for="TargetCollegeName" class="form-control" />
+									<span asp-validation-for="TargetCollegeName" class="text-danger"></span>
+								</div>
+							}
+						}
+
+						<div class="form-group">
+							<label asp-for="Subject"></label>
+							<input asp-for="Subject" class="form-control" />
+							<span asp-validation-for="Subject" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Rating</label>
+							<div id="starRating" class="mb-2">
+								@for (var i = 1; i <= 5; i++)
+								{
+									<button type="button" class="btn btn-link p-0 mr-1 star" data-value="@i">
+										<i class="fas fa-star" style="font-size: 1.5rem; color: #ccc;"></i>
+									</button>
+								}
+							</div>
+							<input type="hidden" asp-for="Rating" />
+							<span asp-validation-for="Rating" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="Message"></label>
+							<textarea asp-for="Message" class="form-control" rows="5"></textarea>
+							<span asp-validation-for="Message" class="text-danger"></span>
+						</div>
+
+						<button type="submit" class="btn btn-primary">Submit Feedback</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<script>
+		(function() {
+			var stars = document.querySelectorAll('#starRating .star');
+			var hidden = document.querySelector('input[name="Rating"]');
+			function paint(n) {
+				stars.forEach(function(btn) {
+					var i = btn.querySelector('i');
+					var val = parseInt(btn.getAttribute('data-value'));
+					i.style.color = val <= n ? '#ffc107' : '#ccc';
+				});
+			}
+			stars.forEach(function(btn) {
+				btn.addEventListener('click', function() {
+					var n = parseInt(this.getAttribute('data-value'));
+					hidden.value = n;
+					paint(n);
+				});
+			});
+			// initial
+			paint(parseInt(hidden.value || '0'));
+		})();
+	</script>
+}

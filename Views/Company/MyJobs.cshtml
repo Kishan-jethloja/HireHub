@@ -1,0 +1,61 @@
+@model IEnumerable<PlacementManagementSystem.Models.JobPosting>
+@{
+	ViewData["Title"] = "My Job Posts";
+}
+
+<div class="container">
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<h2 class="mb-0">My Job Posts</h2>
+		<a asp-action="CreateJob" class="btn btn-primary">Create New</a>
+	</div>
+
+	@if (TempData["Success"] != null)
+	{
+		<div class="alert alert-success" role="alert">@TempData["Success"]</div>
+	}
+
+	@if (!Model.Any())
+	{
+		<p>No job posts yet.</p>
+	}
+	else
+	{
+		<div class="table-responsive">
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Type</th>
+						<th>College</th>
+						<th>Location</th>
+						<th>CTC/Stipend</th>
+						<th>Apply By</th>
+						<th>Google Form</th>
+						<th>Created</th>
+					</tr>
+				</thead>
+				<tbody>
+				@foreach (var j in Model)
+				{
+					<tr>
+						<td>@j.Title</td>
+						<td>@j.Type</td>
+						<td>@j.CollegeName</td>
+						<td>@j.Location</td>
+						<td>@(j.Compensation?.ToString() ?? "-")</td>
+						<td>@(j.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</td>
+						<td>
+							@if (!string.IsNullOrWhiteSpace(j.GoogleFormUrl))
+							{
+								<a href="@j.GoogleFormUrl" target="_blank">Open Form</a>
+							}
+							else { @("-") }
+						</td>
+						<td>@j.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		</div>
+	}
+</div>

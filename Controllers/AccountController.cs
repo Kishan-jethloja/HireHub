@@ -39,6 +39,11 @@ namespace PlacementManagementSystem.Controllers
 				var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 				if (result.Succeeded)
 				{
+					var user = await _userManager.FindByEmailAsync(model.Email);
+					if (user != null && user.UserType == UserType.Company)
+					{
+						return RedirectToAction("MyJobs", "Company");
+					}
 					if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
 					{
 						return Redirect(returnUrl);

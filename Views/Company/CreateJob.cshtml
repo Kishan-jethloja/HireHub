@@ -1,0 +1,89 @@
+@model PlacementManagementSystem.Models.JobPosting
+@using PlacementManagementSystem.Models
+@{
+	ViewData["Title"] = "Create Job/Internship";
+}
+
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header">
+					<h2 class="mb-0">Create Job/Internship</h2>
+				</div>
+				<div class="card-body">
+					@if (TempData["Success"] != null)
+					{
+						<div class="alert alert-success" role="alert">@TempData["Success"]</div>
+					}
+					<form asp-action="CreateJob" method="post">
+						@Html.AntiForgeryToken()
+						<div asp-validation-summary="All" class="text-danger"></div>
+
+						<div class="form-group">
+							<label asp-for="Type"></label>
+							<select asp-for="Type" class="form-control">
+								<option value="1">Internship</option>
+								<option value="2">Full Time</option>
+								<option value="3">Part Time</option>
+								<option value="4">Contract</option>
+							</select>
+							<span asp-validation-for="Type" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="CollegeName">Target College</label>
+							<input asp-for="CollegeName" class="form-control" placeholder="e.g., ABC Engineering College" />
+							<span asp-validation-for="CollegeName" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="Title"></label>
+							<input asp-for="Title" class="form-control" placeholder="Job/Internship Title" />
+							<span asp-validation-for="Title" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="Description"></label>
+							<textarea asp-for="Description" class="form-control" rows="5" placeholder="Short description, requirements, eligibility, selection process, etc."></textarea>
+							<span asp-validation-for="Description" class="text-danger"></span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label asp-for="Location"></label>
+								<input asp-for="Location" class="form-control" placeholder="City/Remote" />
+								<span asp-validation-for="Location" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label asp-for="Compensation"></label>
+								<input asp-for="Compensation" class="form-control" placeholder="Numeric amount" />
+								<span asp-validation-for="Compensation" class="text-danger"></span>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="ApplyByUtc"></label>
+							<input asp-for="ApplyByUtc" type="date" class="form-control" />
+							<span asp-validation-for="ApplyByUtc" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="GoogleFormUrl"></label>
+							<input asp-for="GoogleFormUrl" class="form-control" placeholder="https://docs.google.com/forms/..." />
+							<span asp-validation-for="GoogleFormUrl" class="text-danger"></span>
+							<small class="form-text text-muted">Create a Google Form and paste its public URL here for student applications.</small>
+						</div>
+
+						<button type="submit" class="btn btn-primary">Publish</button>
+						<a asp-action="MyJobs" class="btn btn-link">Cancel</a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

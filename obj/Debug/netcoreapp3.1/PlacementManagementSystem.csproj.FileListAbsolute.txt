@@ -151,3 +151,7 @@ E:\HireHub\obj\Debug\netcoreapp3.1\staticwebassets\PlacementManagementSystem.Sta
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.dll
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.pdb
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.genruntimeconfig.cache
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Home\Contact.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Home\Feedback.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\CreateJob.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\MyJobs.cshtml.g.cs
