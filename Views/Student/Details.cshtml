@@ -1,0 +1,48 @@
+@model PlacementManagementSystem.Models.Student
+@{
+	ViewData["Title"] = "My Profile";
+}
+
+<div class="row">
+	<div class="col-12 mb-3 d-flex justify-content-between align-items-center">
+		<h2 class="mb-0">My Profile</h2>
+		<a class="btn btn-outline-primary" asp-action="Profile">Edit Profile</a>
+	</div>
+	<div class="col-md-8">
+		<div class="card">
+			<div class="card-body">
+				<dl class="row mb-0">
+					<dt class="col-sm-4">Name</dt>
+					<dd class="col-sm-8">@ViewBag.FullName</dd>
+					<dt class="col-sm-4">Email</dt>
+					<dd class="col-sm-8">@ViewBag.Email</dd>
+					<dt class="col-sm-4">College</dt>
+					<dd class="col-sm-8">@Model.CollegeName</dd>
+					<dt class="col-sm-4">Student ID</dt>
+					<dd class="col-sm-8">@Model.StudentId</dd>
+					<dt class="col-sm-4">Department</dt>
+					<dd class="col-sm-8">@Model.Department</dd>
+					<dt class="col-sm-4">Passing Out Year</dt>
+					<dd class="col-sm-8">@Model.Year</dd>
+					<dt class="col-sm-4">CPI</dt>
+					<dd class="col-sm-8">@Model.CGPA</dd>
+					<dt class="col-sm-4">Skills</dt>
+					<dd class="col-sm-8">@Model.Skills</dd>
+					<dt class="col-sm-4">Resume</dt>
+					<dd class="col-sm-8">
+						@if (!string.IsNullOrWhiteSpace(Model.ResumePath))
+						{
+							<a class="btn btn-sm btn-primary" href="@Model.ResumePath" target="_blank" rel="noopener">View Resume</a>
+						}
+						else
+						{
+							<span class="text-muted">Not uploaded</span>
+						}
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</div>
+
+

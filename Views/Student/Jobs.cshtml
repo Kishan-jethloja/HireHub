@@ -1,0 +1,54 @@
+@model IEnumerable<PlacementManagementSystem.Models.JobPosting>
+@{
+	ViewData["Title"] = "Jobs";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h2 class="mb-0">Jobs for Your College</h2>
+	<a class="btn btn-outline-primary" asp-controller="Student" asp-action="Profile">Edit Profile</a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+	<div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info">No jobs found right now. Check back later.</div>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-hover">
+			<thead class="thead-light">
+				<tr>
+					<th>Title</th>
+					<th>Type</th>
+					<th>Location</th>
+					<th>Apply By</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+			@foreach (var job in Model)
+			{
+				<tr>
+					<td>@job.Title</td>
+					<td>@job.Type</td>
+					<td>@job.Location</td>
+					<td>@(job.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</td>
+					<td>
+						@if (!string.IsNullOrWhiteSpace(job.GoogleFormUrl))
+						{
+							<a class="btn btn-primary btn-sm" href="@job.GoogleFormUrl" target="_blank" rel="noopener">Apply</a>
+						}
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+}
+
+

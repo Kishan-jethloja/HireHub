@@ -12,7 +12,7 @@
                     <h2 class="text-center">Register</h2>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Register" method="post" id="registerForm">
+                    <form asp-action="Register" method="post" id="registerForm" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="All" class="text-danger"></div>
             
@@ -66,51 +66,6 @@
                             <span asp-validation-for="UserType" class="text-danger"></span>
                         </div>
 
-                        <!-- Student specific fields -->
-                        <div id="studentFields" style="display: none;">
-                            <h4>Student Information</h4>
-                            
-                            <div class="form-group">
-                                <label asp-for="CollegeName" class="form-label"></label>
-                                <input asp-for="CollegeName" class="form-control" autocomplete="organization" />
-                                <span asp-validation-for="CollegeName" class="text-danger"></span>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="StudentId" class="form-label"></label>
-                                        <input asp-for="StudentId" class="form-control" autocomplete="on" />
-                                        <span asp-validation-for="StudentId" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="Department" class="form-label"></label>
-                                        <input asp-for="Department" class="form-control" autocomplete="organization-title" />
-                                        <span asp-validation-for="Department" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="Year" class="form-label"></label>
-                                        <input asp-for="Year" class="form-control" autocomplete="on" />
-                                        <span asp-validation-for="Year" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="CGPA" class="form-label"></label>
-                                        <input asp-for="CGPA" class="form-control" autocomplete="on" />
-                                        <span asp-validation-for="CGPA" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Company specific fields -->
                         <div id="companyFields" style="display: none;">
                             <h4>Company Information</h4>
@@ -156,15 +111,9 @@
         // User type selection functionality
         document.getElementById('userTypeSelect').addEventListener('change', function() {
             var userType = this.value;
-            var studentFields = document.getElementById('studentFields');
             var companyFields = document.getElementById('companyFields');
-            
-            studentFields.style.display = 'none';
             companyFields.style.display = 'none';
-            
-            if (userType === '1') {
-                studentFields.style.display = 'block';
-            } else if (userType === '2') {
+            if (userType === '2') {
                 companyFields.style.display = 'block';
             }
         });

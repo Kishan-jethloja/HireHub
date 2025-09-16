@@ -155,3 +155,7 @@ E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Home\Contact.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Home\Feedback.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\CreateJob.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\MyJobs.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Jobs.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Profile.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Account\AccessDenied.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Details.cshtml.g.cs

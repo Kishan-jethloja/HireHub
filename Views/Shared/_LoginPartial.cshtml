@@ -8,7 +8,15 @@
 {
     <ul class="navbar-nav align-items-center">
         <li class="nav-item mr-2">
-            <span class="navbar-text text-muted">Hello @User.Identity.Name!</span>
+            @{ var currentUser = UserManager.GetUserAsync(User).Result; }
+            @if (currentUser != null && currentUser.UserType == UserType.Student)
+            {
+                <a class="btn btn-link btn-sm" asp-controller="Student" asp-action="Details">Profile</a>
+            }
+            else if (currentUser != null && currentUser.UserType == UserType.Company)
+            {
+                <a class="btn btn-link btn-sm" asp-controller="Company" asp-action="MyJobs">My Jobs</a>
+            }
         </li>
         <li class="nav-item">
             <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">

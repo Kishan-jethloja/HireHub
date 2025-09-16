@@ -5,6 +5,7 @@ using PlacementManagementSystem.ViewModels;
 using System.Threading.Tasks;
 using PlacementManagementSystem.Data;
 using System;
+using System.IO;
 
 namespace PlacementManagementSystem.Controllers
 {
@@ -73,26 +74,6 @@ namespace PlacementManagementSystem.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Register(RegisterViewModel model)
 		{
-			// Additional server-side validation for student
-			if (model.UserType == UserType.Student)
-			{
-				if (string.IsNullOrWhiteSpace(model.CollegeName))
-				{
-					ModelState.AddModelError(nameof(model.CollegeName), "College Name is required for students.");
-				}
-				if (string.IsNullOrWhiteSpace(model.StudentId))
-				{
-					ModelState.AddModelError(nameof(model.StudentId), "Student ID is required for students.");
-				}
-				if (string.IsNullOrWhiteSpace(model.Department))
-				{
-					ModelState.AddModelError(nameof(model.Department), "Department is required for students.");
-				}
-				if (string.IsNullOrWhiteSpace(model.Year))
-				{
-					ModelState.AddModelError(nameof(model.Year), "Academic Year is required for students.");
-				}
-			}
 
 			if (!ModelState.IsValid)
 			{
@@ -114,21 +95,7 @@ namespace PlacementManagementSystem.Controllers
 			{
 				try
 				{
-					if (model.UserType == UserType.Student)
-					{
-						var student = new Student
-						{
-							UserId = user.Id,
-							CollegeName = model.CollegeName,
-							StudentId = model.StudentId,
-							Department = model.Department,
-							Year = model.Year,
-							CGPA = model.CGPA ?? 0
-						};
-						_db.Students.Add(student);
-						await _db.SaveChangesAsync();
-					}
-					else if (model.UserType == UserType.Company)
+					if (model.UserType == UserType.Company)
 					{
 						// Placeholder for company profile creation in future
 					}
@@ -159,6 +126,13 @@ namespace PlacementManagementSystem.Controllers
 		{
 			await _signInManager.SignOutAsync();
 			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpGet]
+		public IActionResult AccessDenied(string returnUrl = null)
+		{
+			ViewData["ReturnUrl"] = returnUrl;
+			return View();
 		}
 	}
 }

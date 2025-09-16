@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using PlacementManagementSystem.Models;
 
 namespace PlacementManagementSystem.ViewModels
@@ -49,12 +50,15 @@ namespace PlacementManagementSystem.ViewModels
         public string Department { get; set; }
 
         [StringLength(10)]
-        [Display(Name = "Year")]
+        [Display(Name = "Passing Out Year")]
         public string Year { get; set; }
 
         [Range(0, 10)]
-        [Display(Name = "CGPA")]
+        [Display(Name = "CPI")]
         public decimal? CGPA { get; set; }
+
+        [Display(Name = "Resume (PDF)")]
+        public IFormFile ResumeFile { get; set; }
 
         // Company specific fields
         [StringLength(200)]

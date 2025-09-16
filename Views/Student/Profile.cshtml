@@ -1,0 +1,61 @@
+@model PlacementManagementSystem.Models.Student
+@{
+	ViewData["Title"] = "Student Profile";
+}
+
+<h2>Student Profile</h2>
+
+@if (TempData["Success"] != null)
+{
+	<div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="Profile" method="post" class="mt-3" enctype="multipart/form-data">
+	@Html.AntiForgeryToken()
+	<div asp-validation-summary="All" class="text-danger"></div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label asp-for="CollegeName"></label>
+			<input asp-for="CollegeName" class="form-control" />
+			<span asp-validation-for="CollegeName" class="text-danger"></span>
+		</div>
+		<div class="form-group col-md-6">
+			<label asp-for="StudentId"></label>
+			<input asp-for="StudentId" class="form-control" />
+			<span asp-validation-for="StudentId" class="text-danger"></span>
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label asp-for="Department"></label>
+			<input asp-for="Department" class="form-control" />
+			<span asp-validation-for="Department" class="text-danger"></span>
+		</div>
+		<div class="form-group col-md-3">
+			<label asp-for="Year">Passing Out Year</label>
+			<input asp-for="Year" class="form-control" />
+			<span asp-validation-for="Year" class="text-danger"></span>
+		</div>
+		<div class="form-group col-md-3">
+			<label asp-for="CGPA">CPI</label>
+			<input asp-for="CGPA" class="form-control" step="0.01" min="0" max="10" />
+			<span asp-validation-for="CGPA" class="text-danger"></span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label asp-for="Skills"></label>
+		<textarea asp-for="Skills" class="form-control" rows="3"></textarea>
+		<span asp-validation-for="Skills" class="text-danger"></span>
+	</div>
+	<div class="form-group">
+		<label>Resume (PDF)</label>
+		<input type="file" name="resumeFile" class="form-control-file" accept="application/pdf" />
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
+
+

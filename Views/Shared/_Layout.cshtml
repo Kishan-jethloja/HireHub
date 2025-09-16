@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @using Microsoft.AspNetCore.Identity
+    @using PlacementManagementSystem.Models
+    @inject SignInManager<ApplicationUser> SignInManager
+    @inject UserManager<ApplicationUser> UserManager
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HireHub</title>
@@ -20,9 +24,23 @@
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#students">Students</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Students</a></li>
                         <li class="nav-item"><a class="nav-link" href="#companies">Companies</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="MyJobs">Jobs</a></li>
+                        @{
+                            ApplicationUser currentUser = SignInManager.IsSignedIn(User) ? UserManager.GetUserAsync(User).Result : null;
+                        }
+                        @if (currentUser == null)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Jobs</a></li>
+                        }
+                        else if (currentUser.UserType == UserType.Student)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Jobs</a></li>
+                        }
+                        else if (currentUser.UserType == UserType.Company)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="MyJobs">Jobs</a></li>
+                        }
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Feedback">Feedback</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     </ul>

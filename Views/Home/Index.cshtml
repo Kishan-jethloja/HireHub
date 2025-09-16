@@ -6,6 +6,20 @@
 @if (User.Identity.IsAuthenticated)
 {
     <div class="container">
+        @if (TempData["ProfileUpdated"] != null)
+        {
+            <div class="alert alert-success" role="alert">Your profile has been updated.</div>
+        }
+        @* Profile completion banner for students *@
+        @if (ViewBag.ShowProfileBanner == true)
+        {
+            <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+                <div>
+                    <strong>Please complete your profile.</strong> Add your college, CPI, department, passing out year, and resume.
+                </div>
+                <a class="btn btn-sm btn-primary" asp-controller="Student" asp-action="Profile">Go to Profile</a>
+            </div>
+        }
         <div class="row">
             <div class="col-12 mb-3">
                 <h2 class="mb-0">Dashboard</h2>
@@ -43,7 +57,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Browse Jobs</h5>
                             <p class="card-text">Explore internships and full-time roles.</p>
-                            <a class="btn btn-primary" asp-controller="Company" asp-action="MyJobs">Jobs</a>
+                            <a class="btn btn-primary" asp-controller="Student" asp-action="Jobs">Jobs</a>
                         </div>
                     </div>
                 </div>

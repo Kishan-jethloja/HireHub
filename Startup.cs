@@ -36,6 +36,12 @@ namespace PlacementManagementSystem
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

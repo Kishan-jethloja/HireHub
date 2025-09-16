@@ -19,8 +19,20 @@ namespace PlacementManagementSystem.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            ViewBag.ShowProfileBanner = false;
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null && user.UserType == UserType.Student)
+            {
+                var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id);
+                bool incomplete = student == null
+                    || string.IsNullOrWhiteSpace(student.CollegeName)
+                    || string.IsNullOrWhiteSpace(student.StudentId)
+                    || string.IsNullOrWhiteSpace(student.Department)
+                    || string.IsNullOrWhiteSpace(student.Year);
+                ViewBag.ShowProfileBanner = incomplete;
+            }
             return View();
         }
 
