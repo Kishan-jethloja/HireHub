@@ -35,5 +35,8 @@ namespace PlacementManagementSystem.Models
 
         [StringLength(1000)]
         public string ResumePath { get; set; }
+
+		// Approval by College
+		public bool IsApproved { get; set; }
     }
 }

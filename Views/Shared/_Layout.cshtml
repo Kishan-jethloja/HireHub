@@ -24,10 +24,20 @@
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Students</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#companies">Companies</a></li>
                         @{
-                            ApplicationUser currentUser = SignInManager.IsSignedIn(User) ? UserManager.GetUserAsync(User).Result : null;
+                            var currentUser = SignInManager.IsSignedIn(User) ? UserManager.GetUserAsync(User).Result : null;
+                        }
+                        @if (currentUser == null)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Students</a></li>
+                        }
+                        else if (currentUser.UserType == UserType.College)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="College" asp-action="Students">Students</a></li>
+                        }
+                        @if (currentUser != null && currentUser.UserType == UserType.College)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="College" asp-action="Companies">Companies</a></li>
                         }
                         @if (currentUser == null)
                         {
@@ -36,10 +46,6 @@
                         else if (currentUser.UserType == UserType.Student)
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Jobs</a></li>
-                        }
-                        else if (currentUser.UserType == UserType.Company)
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="MyJobs">Jobs</a></li>
                         }
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Feedback">Feedback</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a></li>

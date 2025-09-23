@@ -8,6 +8,10 @@
 		<h2 class="mb-0">My Profile</h2>
 		<a class="btn btn-outline-primary" asp-action="Profile">Edit Profile</a>
 	</div>
+	@if (TempData["Pending"] != null)
+	{
+		<div class="col-12"><div class="alert alert-warning">@TempData["Pending"]</div></div>
+	}
 	<div class="col-md-8">
 		<div class="card">
 			<div class="card-body">
@@ -17,7 +21,17 @@
 					<dt class="col-sm-4">Email</dt>
 					<dd class="col-sm-8">@ViewBag.Email</dd>
 					<dt class="col-sm-4">College</dt>
-					<dd class="col-sm-8">@Model.CollegeName</dd>
+					<dd class="col-sm-8">
+						@if (!Model.IsApproved && !string.IsNullOrEmpty(Model.CollegeName) && Model.CollegeName != "Unassigned")
+						{
+							<span>@Model.CollegeName</span>
+							<span class="badge badge-warning ml-2">Pending confirmation</span>
+						}
+						else
+						{
+							<span>@Model.CollegeName</span>
+						}
+					</dd>
 					<dt class="col-sm-4">Student ID</dt>
 					<dd class="col-sm-8">@Model.StudentId</dd>
 					<dt class="col-sm-4">Department</dt>

@@ -1,0 +1,95 @@
+@model IEnumerable<PlacementManagementSystem.Models.Student>
+@{
+	ViewData["Title"] = "Students";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Students</h2>
+    @if (ViewBag.ShowCollegeFilter == true)
+    {
+        <form method="get" class="form-inline">
+            <label class="mr-2">College</label>
+            <select name="college" class="form-control mr-2" onchange="this.form.submit()">
+                @if (string.IsNullOrEmpty((string)ViewBag.SelectedCollege))
+                {
+                    <option value="" selected>All</option>
+                }
+                else
+                {
+                    <option value="">All</option>
+                }
+                @foreach (var c in (IEnumerable<string>)ViewBag.Colleges)
+                {
+                    if ((string)ViewBag.SelectedCollege == c)
+                    {
+                        <option value="@c" selected>@c</option>
+                    }
+                    else
+                    {
+                        <option value="@c">@c</option>
+                    }
+                }
+            </select>
+            <noscript><button class="btn btn-primary" type="submit">Filter</button></noscript>
+        </form>
+    }
+</div>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info">No students found.</div>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>Student ID</th>
+					<th>Name</th>
+					<th>College</th>
+					<th>Department</th>
+					<th>Year</th>
+					<th>CPI</th>
+					<th>Status</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var s in Model)
+				{
+					<tr>
+						<td>@s.StudentId</td>
+						<td>@s.User?.FullName</td>
+						<td>@s.CollegeName</td>
+						<td>@s.Department</td>
+						<td>@s.Year</td>
+						<td>@s.CGPA</td>
+						<td>
+							@if (s.IsApproved)
+							{
+								<span class="badge badge-success">Approved</span>
+							}
+							else
+							{
+								<span class="badge badge-warning">Pending</span>
+							}
+						</td>
+						<td class="text-right">
+							@if (!s.IsApproved)
+							{
+								<form asp-action="ApproveStudent" method="post" class="mb-0">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="id" value="@s.Id" />
+									<button class="btn btn-sm btn-primary" type="submit">Approve</button>
+								</form>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+

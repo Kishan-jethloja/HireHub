@@ -27,10 +27,15 @@ namespace PlacementManagementSystem.Controllers
             {
                 var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id);
                 bool incomplete = student == null
-                    || string.IsNullOrWhiteSpace(student.CollegeName)
                     || string.IsNullOrWhiteSpace(student.StudentId)
+                    || string.IsNullOrWhiteSpace(student.CollegeName)
+                    || student.CollegeName == "Unassigned"
                     || string.IsNullOrWhiteSpace(student.Department)
-                    || string.IsNullOrWhiteSpace(student.Year);
+                    || student.Department == "Unassigned"
+                    || string.IsNullOrWhiteSpace(student.Year)
+                    || student.Year == "TBD"
+                    || student.CGPA <= 0
+                    || string.IsNullOrWhiteSpace(student.ResumePath);
                 ViewBag.ShowProfileBanner = incomplete;
             }
             return View();

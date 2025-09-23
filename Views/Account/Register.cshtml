@@ -16,82 +16,77 @@
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="All" class="text-danger"></div>
             
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="FirstName" class="form-label"></label>
-                                    <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
-                                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="LastName" class="form-label"></label>
-                                    <input asp-for="LastName" class="form-control" autocomplete="family-name" />
-                                    <span asp-validation-for="LastName" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" autocomplete="email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="Password" class="form-label"></label>
-                                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
-                                    <span asp-validation-for="Password" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="ConfirmPassword" class="form-label"></label>
-                                    <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
-                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="form-group">
                             <label asp-for="UserType" class="form-label"></label>
                             <select asp-for="UserType" class="form-control" id="userTypeSelect" autocomplete="organization-title">
                                 <option value="">Select your role</option>
                                 <option value="1">Student</option>
                                 <option value="2">Company</option>
+                                <option value="3">College</option>
                             </select>
                             <span asp-validation-for="UserType" class="text-danger"></span>
                         </div>
 
+                        <div id="commonFields" style="display: none;">
+                            <div id="nameFields">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="FirstName" class="form-label"></label>
+                                            <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="LastName" class="form-label"></label>
+                                            <input asp-for="LastName" class="form-control" autocomplete="family-name" />
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Company specific fields -->
-                        <div id="companyFields" style="display: none;">
-                            <h4>Company Information</h4>
-                            
+                        <div id="collegeFields" style="display: none;">
+                            <h4>College Information</h4>
+
                             <div class="form-group">
-                                <label asp-for="CompanyName" class="form-label"></label>
+                                <label class="form-label">College Name</label>
                                 <input asp-for="CompanyName" class="form-control" autocomplete="organization" />
                                 <span asp-validation-for="CompanyName" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="Industry" class="form-label"></label>
-                                <input asp-for="Industry" class="form-control" autocomplete="organization-title" />
-                                <span asp-validation-for="Industry" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label asp-for="Website" class="form-label"></label>
+                                <label class="form-label">College Website</label>
                                 <input asp-for="Website" class="form-control" autocomplete="url" />
                                 <span asp-validation-for="Website" class="text-danger"></span>
                             </div>
+                        </div>
 
+                        <div id="credentialsFields" style="display: none;">
                             <div class="form-group">
-                                <label asp-for="Description" class="form-label"></label>
-                                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                                <span asp-validation-for="Description" class="text-danger"></span>
+                                <label asp-for="Email" class="form-label"></label>
+                                <input asp-for="Email" class="form-control" autocomplete="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Password" class="form-label"></label>
+                                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -109,13 +104,37 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         // User type selection functionality
-        document.getElementById('userTypeSelect').addEventListener('change', function() {
-            var userType = this.value;
-            var companyFields = document.getElementById('companyFields');
-            companyFields.style.display = 'none';
-            if (userType === '2') {
-                companyFields.style.display = 'block';
+        var userTypeSelect = document.getElementById('userTypeSelect');
+        var collegeFields = document.getElementById('collegeFields');
+        var commonFields = document.getElementById('commonFields');
+        var nameFields = document.getElementById('nameFields');
+        var credentialsFields = document.getElementById('credentialsFields');
+
+        function updateVisibility() {
+            var userType = userTypeSelect.value;
+            collegeFields.style.display = 'none';
+            commonFields.style.display = 'none';
+            nameFields.style.display = 'none';
+            credentialsFields.style.display = 'none';
+
+            if (userType === '') {
+                return; // nothing selected
             }
-        });
+            // show common blocks once a role is chosen
+            commonFields.style.display = 'block';
+            credentialsFields.style.display = 'block';
+            // show name fields for Student only
+            if (userType === '1') {
+                nameFields.style.display = 'block';
+            }
+            // show college fields only for College role
+            if (userType === '3') {
+                collegeFields.style.display = 'block';
+            }
+        }
+
+        userTypeSelect.addEventListener('change', updateVisibility);
+        // On page load (handles back/validation scenarios)
+        updateVisibility();
     </script>
 }

@@ -16,6 +16,7 @@ namespace PlacementManagementSystem.Data
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<JobPosting> JobPostings { get; set; }
         public DbSet<Application> Applications { get; set; }
+        public DbSet<College> Colleges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -30,6 +31,11 @@ namespace PlacementManagementSystem.Data
             builder.Entity<Student>()
                 .Property(s => s.CGPA)
                 .HasColumnType("decimal(3,2)");
+
+			// Enforce unique StudentId
+			builder.Entity<Student>()
+				.HasIndex(s => s.StudentId)
+				.IsUnique();
 
             builder.Entity<Company>()
                 .HasOne(c => c.User)
@@ -74,6 +80,8 @@ namespace PlacementManagementSystem.Data
             builder.Entity<Application>()
                 .HasIndex(a => new { a.JobPostingId, a.StudentUserId })
                 .IsUnique();
+
+			// Optional: you can later relate Student.CollegeName to College.Name if normalized
         }
     }
 }

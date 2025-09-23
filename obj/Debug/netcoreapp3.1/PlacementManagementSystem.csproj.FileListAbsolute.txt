@@ -162,3 +162,8 @@ E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Details.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Apply.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Applications.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\ApplicationDetails.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\College\Students.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\College\Profile.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\College\Companies.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\College\CompanyJobs.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Profile.cshtml.g.cs

@@ -15,7 +15,11 @@
             }
             else if (currentUser != null && currentUser.UserType == UserType.Company)
             {
-                <a class="btn btn-link btn-sm" asp-controller="Company" asp-action="MyJobs">My Jobs</a>
+                <a class="btn btn-link btn-sm" asp-controller="Company" asp-action="Profile">Profile</a>
+            }
+            else if (currentUser != null && currentUser.UserType == UserType.College)
+            {
+                <a class="btn btn-link btn-sm" asp-controller="College" asp-action="Profile">Profile</a>
             }
         </li>
         <li class="nav-item">

@@ -1,0 +1,43 @@
+@model IEnumerable<PlacementManagementSystem.Controllers.CollegeController.CompanySummary>
+@{
+	ViewData["Title"] = "Companies";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Companies posting for @ViewBag.College</h2>
+</div>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info">No companies have posted jobs for this college yet.</div>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>Company</th>
+					<th>Email</th>
+					<th>Jobs Posted</th>
+					<th>Last Posted</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var c in Model)
+				{
+					<tr>
+						<td>
+							<a asp-action="CompanyJobs" asp-route-id="@c.CompanyUserId">@c.CompanyName</a>
+						</td>
+						<td>@c.Email</td>
+						<td>@c.JobsCount</td>
+						<td>@c.LastPostedUtc.ToLocalTime().ToString("g")</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+

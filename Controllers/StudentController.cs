@@ -134,6 +134,13 @@ namespace PlacementManagementSystem.Controllers
 				return RedirectToAction("Profile");
 			}
 
+			// Block job listings until college has approved the student
+			if (!student.IsApproved)
+			{
+				TempData["Error"] = $"Pending college confirmation for {student.CollegeName}.";
+				return RedirectToAction("Details");
+			}
+
 			var nowUtc = DateTime.UtcNow;
 			var jobs = _db.JobPostings
 				.Where(j => j.CollegeName == student.CollegeName && (j.ApplyByUtc == null || j.ApplyByUtc >= nowUtc))
@@ -159,6 +166,11 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id) ?? new Student { UserId = user.Id };
+			// Normalize placeholders to empty for first-time display
+			if (student.CollegeName == "Unassigned") student.CollegeName = string.Empty;
+			if (student.Department == "Unassigned") student.Department = string.Empty;
+			if (student.Year == "TBD") student.Year = string.Empty;
+			ViewBag.Colleges = _db.Colleges.Select(c => c.Name).OrderBy(n => n).ToList();
 			return View(student);
 		}
 
@@ -196,9 +208,12 @@ namespace PlacementManagementSystem.Controllers
 			// UserId comes from the logged-in user, not the form
 			ModelState.Remove("UserId");
 			ModelState.Remove("Id");
+			// StudentId is auto-generated and not submitted by the form
+			ModelState.Remove("StudentId");
 
 			if (!ModelState.IsValid)
 			{
+				ViewBag.Colleges = _db.Colleges.Select(c => c.Name).OrderBy(n => n).ToList();
 				return View(model);
 			}
 
@@ -209,7 +224,7 @@ namespace PlacementManagementSystem.Controllers
 				{
 					UserId = user.Id,
 					CollegeName = model.CollegeName,
-					StudentId = model.StudentId,
+					// StudentId will be auto-generated below
 					Department = model.Department,
 					Year = model.Year,
 					CGPA = model.CGPA,
@@ -220,12 +235,33 @@ namespace PlacementManagementSystem.Controllers
 			}
 			else
 			{
+				// If college changed, reset approval
+				if (student.CollegeName != model.CollegeName)
+				{
+					student.IsApproved = false;
+				}
 				student.CollegeName = model.CollegeName;
-				student.StudentId = model.StudentId;
+				// StudentId remains immutable once assigned
 				student.Department = model.Department;
 				student.Year = model.Year;
 				student.CGPA = model.CGPA;
 				student.Skills = model.Skills;
+			}
+
+			// Ensure StudentId exists and is unique; generate on first save
+			if (string.IsNullOrWhiteSpace(student.StudentId))
+			{
+				// Simple unique generator: yyyymm + 4 random digits
+				// Loop to avoid rare collisions
+				var prefix = DateTime.UtcNow.ToString("yyyyMM");
+				var rng = new Random();
+				string candidate;
+				do
+				{
+					candidate = $"{prefix}{rng.Next(1000, 10000)}";
+				}
+				while (_db.Students.Any(s => s.StudentId == candidate));
+				student.StudentId = candidate;
 			}
 
 			// Save resume if uploaded
@@ -247,6 +283,10 @@ namespace PlacementManagementSystem.Controllers
 
 			await _db.SaveChangesAsync();
 			TempData["ProfileUpdated"] = true;
+			if (!student.IsApproved && !string.IsNullOrEmpty(student.CollegeName) && student.CollegeName != "Unassigned")
+			{
+				TempData["Pending"] = $"Request sent to {student.CollegeName}. Awaiting approval.";
+			}
 			return RedirectToAction("Index", "Home");
 		}
 	}

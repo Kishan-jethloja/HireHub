@@ -23,6 +23,6 @@ namespace PlacementManagementSystem.Models
     {
         Student = 1,
         Company = 2,
-        Admin = 3
+        College = 3
     }
 }

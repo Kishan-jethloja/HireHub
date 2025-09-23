@@ -21,6 +21,58 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
+		public async Task<IActionResult> Profile()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+			var company = _db.Companies.FirstOrDefault(c => c.UserId == user.Id) ?? new Company { UserId = user.Id };
+			return View(company);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Profile(Company model)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+			var company = _db.Companies.FirstOrDefault(c => c.UserId == user.Id);
+			if (company == null)
+			{
+				company = new Company
+				{
+					UserId = user.Id,
+					CompanyName = model.CompanyName,
+					Description = model.Description,
+					Website = model.Website,
+					Industry = model.Industry,
+					Address = model.Address
+				};
+				_db.Companies.Add(company);
+			}
+			else
+			{
+				company.CompanyName = model.CompanyName;
+				company.Description = model.Description;
+				company.Website = model.Website;
+				company.Industry = model.Industry;
+				company.Address = model.Address;
+			}
+			await _db.SaveChangesAsync();
+			TempData["Success"] = "Profile updated.";
+			return RedirectToAction("Profile");
+		}
+
+		[HttpGet]
 		public IActionResult CreateJob()
 		{
 			return View(new JobPosting());
