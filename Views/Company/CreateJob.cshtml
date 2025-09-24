@@ -31,7 +31,17 @@
 
 						<div class="form-group">
 							<label asp-for="CollegeName">Target College</label>
-							<input asp-for="CollegeName" class="form-control" placeholder="e.g., ABC Engineering College" />
+							<select asp-for="CollegeName" class="form-control">
+								<option value="">Select College</option>
+								<option value="All Colleges">All Colleges</option>
+								@if (ViewBag.Colleges != null)
+								{
+									@foreach (var collegeName in ViewBag.Colleges)
+									{
+										<option value="@collegeName">@collegeName</option>
+									}
+								}
+							</select>
 							<span asp-validation-for="CollegeName" class="text-danger"></span>
 						</div>
 

@@ -83,7 +83,7 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			var jobGroups = _db.JobPostings
-				.Where(j => j.CollegeName == ownedCollege)
+				.Where(j => j.CollegeName == ownedCollege || j.CollegeName == "All Colleges")
 				.GroupBy(j => j.CompanyUserId)
 				.Select(g => new { CompanyUserId = g.Key, JobsCount = g.Count(), LastPostedUtc = g.Max(x => x.CreatedAtUtc) })
 				.ToList();
@@ -135,7 +135,7 @@ namespace PlacementManagementSystem.Controllers
 
 			var companyName = _db.Companies.FirstOrDefault(c => c.UserId == id)?.CompanyName ?? "(Unknown)";
 			var jobs = _db.JobPostings
-				.Where(j => j.CompanyUserId == id && j.CollegeName == ownedCollege)
+				.Where(j => j.CompanyUserId == id && (j.CollegeName == ownedCollege || j.CollegeName == "All Colleges"))
 				.OrderByDescending(j => j.CreatedAtUtc)
 				.ToList();
 

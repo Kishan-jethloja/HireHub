@@ -75,6 +75,8 @@ namespace PlacementManagementSystem.Controllers
 		[HttpGet]
 		public IActionResult CreateJob()
 		{
+			// Provide registered colleges for the dropdown
+			ViewBag.Colleges = _db.Colleges.Select(c => c.Name).OrderBy(n => n).ToList();
 			return View(new JobPosting());
 		}
 
@@ -90,6 +92,8 @@ namespace PlacementManagementSystem.Controllers
 
 			if (!ModelState.IsValid)
 			{
+				// Re-populate colleges dropdown on validation error
+				ViewBag.Colleges = _db.Colleges.Select(c => c.Name).OrderBy(n => n).ToList();
 				return View(model);
 			}
 
