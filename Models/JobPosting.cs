@@ -44,6 +44,10 @@ namespace PlacementManagementSystem.Models
 		[Display(Name = "Stipend/CTC (numeric)")]
 		public int? Compensation { get; set; }
 
+		[Range(0, 10)]
+		[Display(Name = "Minimum CPI Required")]
+		public decimal? MinimumCPI { get; set; }
+
 		[Display(Name = "Application Deadline")]
 		public DateTime? ApplyByUtc { get; set; }
 

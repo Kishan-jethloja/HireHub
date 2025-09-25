@@ -21,6 +21,7 @@ else
 					<th>Type</th>
 					<th>Location</th>
 					<th>Compensation</th>
+					<th>Min CPI</th>
 					<th>Apply By</th>
 					<th>Posted</th>
 				</tr>
@@ -33,6 +34,7 @@ else
 						<td>@j.Type</td>
 						<td>@j.Location</td>
 						<td>@(j.Compensation?.ToString() ?? "-")</td>
+						<td>@(j.MinimumCPI?.ToString() ?? "-")</td>
 						<td>@(j.ApplyByUtc?.ToLocalTime().ToString("g") ?? "-")</td>
 						<td>@j.CreatedAtUtc.ToLocalTime().ToString("g")</td>
 					</tr>

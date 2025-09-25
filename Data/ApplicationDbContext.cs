@@ -32,6 +32,10 @@ namespace PlacementManagementSystem.Data
                 .Property(s => s.CGPA)
                 .HasColumnType("decimal(3,2)");
 
+            builder.Entity<JobPosting>()
+                .Property(j => j.MinimumCPI)
+                .HasColumnType("decimal(3,2)");
+
 			// Enforce unique StudentId
 			builder.Entity<Student>()
 				.HasIndex(s => s.StudentId)

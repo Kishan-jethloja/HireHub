@@ -144,6 +144,7 @@ namespace PlacementManagementSystem.Controllers
 			var nowUtc = DateTime.UtcNow;
 			var jobs = _db.JobPostings
 				.Where(j => j.CollegeName == student.CollegeName && (j.ApplyByUtc == null || j.ApplyByUtc >= nowUtc))
+				.Where(j => j.MinimumCPI == null || j.MinimumCPI <= student.CGPA) // Filter by CPI requirement
 				.OrderByDescending(j => j.CreatedAtUtc)
 				.ToList();
 

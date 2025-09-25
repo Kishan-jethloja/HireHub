@@ -165,5 +165,33 @@ namespace PlacementManagementSystem.Controllers
 			ViewBag.Job = job;
 			return View(app);
 		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteJob(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id && j.CompanyUserId == user.Id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			// Delete related applications first
+			var applications = _db.Applications.Where(a => a.JobPostingId == id).ToList();
+			_db.Applications.RemoveRange(applications);
+
+			// Delete the job posting
+			_db.JobPostings.Remove(job);
+			await _db.SaveChangesAsync();
+
+			TempData["Success"] = "Job posting deleted successfully.";
+			return RedirectToAction("MyJobs");
+		}
 	}
 }

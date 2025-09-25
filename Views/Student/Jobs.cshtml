@@ -34,7 +34,13 @@ else
 							<h5 class="card-title mb-0">@job.Title</h5>
 							<span class="badge badge-primary">@job.Type</span>
 						</div>
-						<p class="text-muted mb-2"><i class="fas fa-map-marker-alt mr-1"></i>@(string.IsNullOrWhiteSpace(job.Location) ? "Remote/NA" : job.Location)</p>
+						<p class="text-muted mb-2">
+							<i class="fas fa-map-marker-alt mr-1"></i>@(string.IsNullOrWhiteSpace(job.Location) ? "Remote/NA" : job.Location)
+							@if (job.MinimumCPI.HasValue)
+							{
+								<span class="badge badge-info ml-2">Min CPI: @job.MinimumCPI</span>
+							}
+						</p>
 						@if (!string.IsNullOrWhiteSpace(job.Description))
 						{
 							<p class="card-text text-truncate" title="@job.Description">@job.Description</p>

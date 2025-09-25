@@ -31,17 +31,32 @@
 						<div class="card-body d-flex flex-column">
 							<div class="d-flex justify-content-between align-items-start mb-2">
 								<h5 class="card-title mb-0">@j.Title</h5>
-								<span class="badge badge-primary">@j.Type</span>
+								<div class="d-flex align-items-center">
+									<span class="badge badge-primary mr-2">@j.Type</span>
+									<div class="dropdown">
+										<button class="btn btn-link btn-sm text-muted p-0" type="button" id="dropdownMenuButton@j.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<i class="fas fa-ellipsis-v"></i>
+										</button>
+										<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton@j.Id">
+											<button class="dropdown-item text-danger" onclick="confirmDelete(@j.Id, '@j.Title')">
+												<i class="fas fa-trash mr-2"></i>Delete Job
+											</button>
+										</div>
+									</div>
+								</div>
 							</div>
 							<ul class="list-unstyled mb-3">
 								<li><strong>College:</strong> @j.CollegeName</li>
 								<li><strong>Location:</strong> @(string.IsNullOrWhiteSpace(@j.Location) ? "Remote/NA" : @j.Location)</li>
 								<li><strong>CTC/Stipend:</strong> @(j.Compensation?.ToString() ?? "-")</li>
+								<li><strong>Min CPI:</strong> @(j.MinimumCPI?.ToString() ?? "No requirement")</li>
 								<li><strong>Apply By:</strong> @(j.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</li>
 							</ul>
 							<div class="mt-auto d-flex justify-content-between align-items-center">
 								<small class="text-muted">Created: @j.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
-								<a class="btn btn-outline-primary btn-sm" asp-action="Applications" asp-route-id="@j.Id">View Applications</a>
+								<a class="btn btn-outline-primary btn-sm" asp-action="Applications" asp-route-id="@j.Id">
+									<i class="fas fa-eye mr-1"></i>View Applications
+								</a>
 							</div>
 						</div>
 					</div>
@@ -50,3 +65,38 @@
 		</div>
 	}
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Are you sure you want to delete the job posting "<span id="jobTitle"></span>"?</p>
+				<p class="text-danger"><strong>This action cannot be undone and will also delete all related applications.</strong></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<form id="deleteForm" method="post" style="display: inline;">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="btn btn-danger">Delete Job</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		function confirmDelete(jobId, jobTitle) {
+			document.getElementById('jobTitle').textContent = jobTitle;
+			document.getElementById('deleteForm').action = '@Url.Action("DeleteJob")/' + jobId;
+			$('#deleteModal').modal('show');
+		}
+	</script>
+}
