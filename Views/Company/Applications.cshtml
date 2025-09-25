@@ -22,7 +22,15 @@ else
 					<strong>@a.ApplicantName</strong>
 					<span class="text-muted ml-2">(College ID: @a.CollegeId)</span>
 				</span>
-				<small class="text-muted">@a.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
+				<span>
+					@{
+						var statusClass = a.Status == PlacementManagementSystem.Models.ApplicationStatus.Hired
+							? "badge-success"
+							: (a.Status == PlacementManagementSystem.Models.ApplicationStatus.Rejected ? "badge-danger" : "badge-secondary");
+					}
+					<span class="badge @statusClass mr-2">@a.Status</span>
+					<small class="text-muted">@a.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
+				</span>
 			</a>
 		}
 	</div>

@@ -168,6 +168,60 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Hire(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var app = _db.Applications.FirstOrDefault(a => a.Id == id);
+			if (app == null)
+			{
+				return NotFound();
+			}
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == app.JobPostingId);
+			if (job == null || job.CompanyUserId != user.Id)
+			{
+				return Forbid();
+			}
+
+			app.Status = ApplicationStatus.Hired;
+			await _db.SaveChangesAsync();
+			TempData["Success"] = "Applicant marked as Hired.";
+			return RedirectToAction("ApplicationDetails", new { id });
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Reject(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var app = _db.Applications.FirstOrDefault(a => a.Id == id);
+			if (app == null)
+			{
+				return NotFound();
+			}
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == app.JobPostingId);
+			if (job == null || job.CompanyUserId != user.Id)
+			{
+				return Forbid();
+			}
+
+			app.Status = ApplicationStatus.Rejected;
+			await _db.SaveChangesAsync();
+			TempData["Success"] = "Applicant rejected.";
+			return RedirectToAction("ApplicationDetails", new { id });
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeleteJob(int id)
 		{
 			var user = await _userManager.GetUserAsync(User);

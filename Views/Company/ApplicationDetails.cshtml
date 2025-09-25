@@ -11,7 +11,15 @@
 <div class="card">
 	<div class="card-body">
 		<h4 class="card-title">@Model.ApplicantName</h4>
-		<p class="text-muted">@Model.ApplicantEmail</p>
+		<p class="text-muted mb-1">@Model.ApplicantEmail</p>
+		<p>
+			@{
+				var statusClass = Model.Status == PlacementManagementSystem.Models.ApplicationStatus.Hired
+					? "badge-success"
+					: (Model.Status == PlacementManagementSystem.Models.ApplicationStatus.Rejected ? "badge-danger" : "badge-secondary");
+			}
+			<span class="badge @statusClass">@Model.Status</span>
+		</p>
 		<dl class="row">
 			<dt class="col-sm-3">College ID</dt>
 			<dd class="col-sm-9">@Model.CollegeId</dd>
@@ -31,6 +39,18 @@
 		{
 			<a class="btn btn-primary btn-sm" href="@Model.ResumePath" target="_blank" rel="noopener">View Resume</a>
 		}
+		<div class="btn-group ml-2" role="group">
+			<form asp-action="Hire" method="post" class="mr-2">
+				@Html.AntiForgeryToken()
+				<input type="hidden" name="id" value="@Model.Id" />
+				<button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to mark this applicant as Hired?');" @(Model.Status == PlacementManagementSystem.Models.ApplicationStatus.Hired ? "disabled" : null)>Hire</button>
+			</form>
+			<form asp-action="Reject" method="post">
+				@Html.AntiForgeryToken()
+				<input type="hidden" name="id" value="@Model.Id" />
+				<button type="submit" class="btn btn-danger btn-sm" @(Model.Status == PlacementManagementSystem.Models.ApplicationStatus.Rejected ? "disabled" : null)>Reject</button>
+			</form>
+		</div>
 	</div>
 </div>
 

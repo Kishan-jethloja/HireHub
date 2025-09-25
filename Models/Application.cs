@@ -4,6 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PlacementManagementSystem.Models
 {
+    public enum ApplicationStatus
+    {
+        Pending = 0,
+        Hired = 1,
+        Rejected = 2
+    }
+
 	public class Application
 	{
 		public int Id { get; set; }
@@ -59,6 +66,8 @@ namespace PlacementManagementSystem.Models
 		[Required]
 		[Display(Name = "I agree to the Terms & Conditions")]
 		public bool TermsAccepted { get; set; }
+
+        public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
 
 		public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 	}
