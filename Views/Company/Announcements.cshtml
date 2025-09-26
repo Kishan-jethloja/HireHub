@@ -1,0 +1,43 @@
+@model IEnumerable<PlacementManagementSystem.Models.Announcement>
+@{
+	ViewData["Title"] = "Announcements";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h2 class="mb-0">Announcements - @ViewBag.Job?.Title</h2>
+	<div>
+		<a class="btn btn-outline-primary mr-2" asp-action="Applications" asp-route-id="@ViewBag.Job?.Id">Back to Applications</a>
+		<a class="btn btn-primary" asp-action="CreateAnnouncement" asp-route-id="@ViewBag.Job?.Id">New Announcement</a>
+	</div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+	<div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+	<div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info">No announcements yet.</div>
+}
+else
+{
+	<div class="list-group">
+		@foreach (var a in Model)
+		{
+			<div class="list-group-item">
+				<div class="d-flex justify-content-between align-items-center">
+					<h5 class="mb-1">@a.Title</h5>
+					<small class="text-muted">@a.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
+				</div>
+				<p class="mb-1">@a.Message</p>
+			</div>
+		}
+	</div>
+}
+
+

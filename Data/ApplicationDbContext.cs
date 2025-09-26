@@ -14,7 +14,8 @@ namespace PlacementManagementSystem.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<JobPosting> JobPostings { get; set; }
+		public DbSet<JobPosting> JobPostings { get; set; }
+		public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Application> Applications { get; set; }
         public DbSet<College> Colleges { get; set; }
 

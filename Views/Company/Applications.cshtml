@@ -5,7 +5,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
 	<h2 class="mb-0">Applications - @ViewBag.Job?.Title</h2>
-	<a class="btn btn-outline-primary" asp-action="MyJobs">Back to My Jobs</a>
+	<div>
+		<a class="btn btn-outline-secondary mr-2" asp-action="Announcements" asp-route-id="@ViewBag.Job?.Id">Announcements</a>
+		<a class="btn btn-outline-primary" asp-action="MyJobs">Back to My Jobs</a>
+	</div>
 </div>
 
 @if (!Model.Any())

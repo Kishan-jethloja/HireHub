@@ -167,3 +167,5 @@ E:\HireHub\obj\Debug\netcoreapp3.1\staticwebassets\PlacementManagementSystem.Sta
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.dll
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.pdb
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.genruntimeconfig.cache
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Announcements.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\CreateAnnouncement.cshtml.g.cs

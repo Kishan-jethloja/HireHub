@@ -1,0 +1,33 @@
+@model PlacementManagementSystem.Models.Announcement
+@{
+	ViewData["Title"] = "New Announcement";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h2 class="mb-0">New Announcement - @ViewBag.Job?.Title</h2>
+	<a class="btn btn-outline-primary" asp-action="Announcements" asp-route-id="@ViewBag.Job?.Id">Back</a>
+</div>
+
+<p class="text-muted">Eligible recipients: @ViewBag.EligibleRecipientCount</p>
+
+<form method="post" asp-controller="Company" asp-action="CreateAnnouncement" asp-route-id="@ViewBag.Job?.Id">
+	@Html.AntiForgeryToken()
+	<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+	<div class="form-group">
+		<label asp-for="Title"></label>
+		<input asp-for="Title" class="form-control" />
+		<span asp-validation-for="Title" class="text-danger"></span>
+	</div>
+	<div class="form-group">
+		<label asp-for="Message"></label>
+		<textarea asp-for="Message" rows="6" class="form-control"></textarea>
+		<span asp-validation-for="Message" class="text-danger"></span>
+	</div>
+	<button type="submit" class="btn btn-primary" @(ViewBag.EligibleRecipientCount == 0 ? "disabled" : "")>Publish</button>
+</form>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
+
+

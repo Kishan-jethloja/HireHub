@@ -6,18 +6,14 @@ namespace PlacementManagementSystem.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Status",
-                table: "Applications",
-                nullable: false,
-                defaultValue: 0);
+            migrationBuilder.Sql(
+                "IF COL_LENGTH('Applications', 'Status') IS NULL BEGIN ALTER TABLE [Applications] ADD [Status] int NOT NULL CONSTRAINT DF_Applications_Status DEFAULT 0; END");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Status",
-                table: "Applications");
+            migrationBuilder.Sql(
+                "IF COL_LENGTH('Applications', 'Status') IS NOT NULL BEGIN ALTER TABLE [Applications] DROP COLUMN [Status]; END");
         }
     }
 }

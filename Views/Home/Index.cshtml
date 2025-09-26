@@ -1,4 +1,5 @@
 @using PlacementManagementSystem.Models
+@using System.Linq
 @{
     ViewData["Title"] = "HireHub";
 }
@@ -20,16 +21,16 @@
                 <a class="btn btn-sm btn-primary" asp-controller="Student" asp-action="Profile">Go to Profile</a>
             </div>
         }
-        <div class="row">
-            <div class="col-12 mb-3">
-                <h2 class="mb-0">Dashboard</h2>
-                <p class="text-muted">Quick links based on your role.</p>
+        @* Company dashboard remains shortcut cards; Student dashboard shows announcements *@
+        @if (User.HasClaim("UserType", ((int)UserType.Company).ToString()))
+        {
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h2 class="mb-0">Dashboard</h2>
+                    <p class="text-muted">Quick links</p>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            @* Company shortcuts *@
-            @if (User.HasClaim("UserType", ((int)UserType.Company).ToString()))
-            {
+            <div class="row">
                 <div class="col-md-4 mb-3">
                     <div class="card h-100">
                         <div class="card-body">
@@ -48,30 +49,37 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h2 class="mb-0">Announcements</h2>
+                    <p class="text-muted">Updates for your active applications</p>
+                </div>
+            </div>
+            var anns = (IEnumerable<PlacementManagementSystem.Models.Announcement>)ViewBag.DashboardAnnouncements ?? Enumerable.Empty<PlacementManagementSystem.Models.Announcement>();
+            @if (!anns.Any())
+            {
+                <div class="alert alert-info">No announcements yet.</div>
             }
-            @* Student shortcuts *@
             else
             {
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Browse Jobs</h5>
-                            <p class="card-text">Explore internships and full-time roles.</p>
-                            <a class="btn btn-primary" asp-controller="Student" asp-action="Jobs">Jobs</a>
+                <div class="list-group">
+                    @foreach (var a in anns)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>@a.Title</strong>
+                                <small class="text-muted">@a.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                            </div>
+                            <div>@a.Message</div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Give Feedback</h5>
-                            <p class="card-text">Share your experience with a company or college.</p>
-                            <a class="btn btn-outline-primary" asp-controller="Home" asp-action="Feedback">Feedback</a>
-                        </div>
-                    </div>
+                    }
                 </div>
             }
-        </div>
+        }
     </div>
 }
 else

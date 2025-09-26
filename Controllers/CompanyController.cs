@@ -5,6 +5,7 @@ using PlacementManagementSystem.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Linq;
+using System;
 
 namespace PlacementManagementSystem.Controllers
 {
@@ -140,6 +141,120 @@ namespace PlacementManagementSystem.Controllers
 
 			ViewBag.Job = job;
 			return View(applications);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Announcements(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id && j.CompanyUserId == user.Id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			var anns = _db.Announcements
+				.Where(a => a.JobPostingId == id)
+				.OrderByDescending(a => a.CreatedAtUtc)
+				.ToList();
+			ViewBag.Job = job;
+			return View(anns);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> CreateAnnouncement(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id && j.CompanyUserId == user.Id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+			ViewBag.Job = job;
+			var eligibleCount = _db.Applications
+				.Where(a => a.JobPostingId == job.Id && a.Status != ApplicationStatus.Rejected)
+				.Select(a => a.StudentUserId)
+				.Distinct()
+				.Count();
+			ViewBag.EligibleRecipientCount = eligibleCount;
+			return View(new Announcement());
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> CreateAnnouncement(int id, Announcement model)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id && j.CompanyUserId == user.Id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			// These are set by server, not posted from the form
+			ModelState.Remove("JobPostingId");
+			ModelState.Remove("CompanyUserId");
+			if (!ModelState.IsValid)
+			{
+				ViewBag.Job = job;
+				ViewBag.EligibleRecipientCount = _db.Applications
+					.Where(a => a.JobPostingId == job.Id && a.Status != ApplicationStatus.Rejected)
+					.Select(a => a.StudentUserId)
+					.Distinct()
+					.Count();
+				return View(model);
+			}
+
+			var recipientCount = _db.Applications
+				.Where(a => a.JobPostingId == job.Id && a.Status != ApplicationStatus.Rejected)
+				.Select(a => a.StudentUserId)
+				.Distinct()
+				.Count();
+			if (recipientCount == 0)
+			{
+				ModelState.AddModelError(string.Empty, "There are no eligible applicants to receive this announcement yet.");
+				ViewBag.Job = job;
+				ViewBag.EligibleRecipientCount = 0;
+				return View(model);
+			}
+
+			var ann = new Announcement
+			{
+				JobPostingId = job.Id,
+				CompanyUserId = user.Id,
+				Title = model.Title,
+				Message = model.Message,
+				CreatedAtUtc = DateTime.UtcNow
+			};
+			_db.Announcements.Add(ann);
+			try
+			{
+				await _db.SaveChangesAsync();
+				TempData["Success"] = $"Announcement posted to {recipientCount} applicant(s).";
+				return RedirectToAction("Announcements", new { id = job.Id });
+			}
+			catch (Exception ex)
+			{
+				ModelState.AddModelError(string.Empty, ex.InnerException?.Message ?? ex.Message);
+				ViewBag.Job = job;
+				ViewBag.EligibleRecipientCount = recipientCount;
+				return View(model);
+			}
 		}
 
 		[HttpGet]

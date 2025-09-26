@@ -38,6 +38,13 @@ namespace PlacementManagementSystem.Controllers
 			}
 			ViewBag.Job = job;
 			var existing = _db.Applications.FirstOrDefault(a => a.JobPostingId == id && a.StudentUserId == user.Id);
+			// Announcements for this job
+			ViewBag.Announcements = _db.Announcements
+				.Where(a => a.JobPostingId == id)
+				.OrderByDescending(a => a.CreatedAtUtc)
+				.ToList();
+			// Current student's application status (if any)
+			ViewBag.StudentApplicationStatus = existing?.Status;
 			if (existing != null)
 			{
 				return View(existing);
@@ -72,6 +79,13 @@ namespace PlacementManagementSystem.Controllers
 			if (!ModelState.IsValid)
 			{
 				ViewBag.Job = job;
+				// Repopulate announcements and current status on validation error
+				var current = _db.Applications.FirstOrDefault(a => a.JobPostingId == job.Id && a.StudentUserId == user.Id);
+				ViewBag.Announcements = _db.Announcements
+					.Where(a => a.JobPostingId == job.Id)
+					.OrderByDescending(a => a.CreatedAtUtc)
+					.ToList();
+				ViewBag.StudentApplicationStatus = current?.Status;
 				return View(model);
 			}
 
@@ -172,6 +186,18 @@ namespace PlacementManagementSystem.Controllers
 			if (student.Department == "Unassigned") student.Department = string.Empty;
 			if (student.Year == "TBD") student.Year = string.Empty;
 			ViewBag.Colleges = _db.Colleges.Select(c => c.Name).OrderBy(n => n).ToList();
+
+			// Announcements for jobs this student applied to and not rejected
+			var eligibleJobIds = _db.Applications
+				.Where(a => a.StudentUserId == user.Id && a.Status != ApplicationStatus.Rejected)
+				.Select(a => a.JobPostingId)
+				.Distinct()
+				.ToList();
+			ViewBag.ProfileAnnouncements = _db.Announcements
+				.Where(a => eligibleJobIds.Contains(a.JobPostingId))
+				.OrderByDescending(a => a.CreatedAtUtc)
+				.Take(10)
+				.ToList();
 			return View(student);
 		}
 
