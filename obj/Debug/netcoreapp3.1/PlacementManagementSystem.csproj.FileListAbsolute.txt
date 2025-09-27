@@ -169,3 +169,9 @@ E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.pdb
 E:\HireHub\obj\Debug\netcoreapp3.1\PlacementManagementSystem.genruntimeconfig.cache
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Announcements.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\CreateAnnouncement.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Announcements.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\Announcement.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Chat\Index.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Feedback.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\StudentFeedback\Create.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\StudentFeedback\Index.cshtml.g.cs

@@ -25,30 +25,8 @@ namespace PlacementManagementSystem.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user != null && user.UserType == UserType.Student)
             {
-                var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id);
-                bool incomplete = student == null
-                    || string.IsNullOrWhiteSpace(student.StudentId)
-                    || string.IsNullOrWhiteSpace(student.CollegeName)
-                    || student.CollegeName == "Unassigned"
-                    || string.IsNullOrWhiteSpace(student.Department)
-                    || student.Department == "Unassigned"
-                    || string.IsNullOrWhiteSpace(student.Year)
-                    || student.Year == "TBD"
-                    || student.CGPA <= 0
-                    || string.IsNullOrWhiteSpace(student.ResumePath);
-                ViewBag.ShowProfileBanner = incomplete;
-
-                // Load announcements for jobs this student applied to and not rejected
-                var eligibleJobIds = _db.Applications
-                    .Where(a => a.StudentUserId == user.Id && a.Status != ApplicationStatus.Rejected)
-                    .Select(a => a.JobPostingId)
-                    .Distinct()
-                    .ToList();
-                ViewBag.DashboardAnnouncements = _db.Announcements
-                    .Where(a => eligibleJobIds.Contains(a.JobPostingId))
-                    .OrderByDescending(a => a.CreatedAtUtc)
-                    .Take(10)
-                    .ToList();
+                // Land students on Jobs by default
+                return RedirectToAction("Jobs", "Student");
             }
             return View();
         }

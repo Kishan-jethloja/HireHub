@@ -1,4 +1,6 @@
 @model IEnumerable<PlacementManagementSystem.Models.JobPosting>
+@using System.Collections.Generic
+@using PlacementManagementSystem.Models
 @{
 	ViewData["Title"] = "Jobs";
 }
@@ -18,6 +20,11 @@
 	<div class="alert alert-success">@TempData["AppSuccess"]</div>
 }
 
+@if (TempData["Success"] != null)
+{
+	<div class="alert alert-success">@TempData["Success"]</div>
+}
+
 @if (!Model.Any())
 {
 	<div class="alert alert-info">No jobs found right now. Check back later.</div>
@@ -32,7 +39,53 @@ else
 					<div class="card-body d-flex flex-column">
 						<div class="d-flex justify-content-between align-items-start mb-2">
 							<h5 class="card-title mb-0">@job.Title</h5>
-							<span class="badge badge-primary">@job.Type</span>
+							<div class="d-flex align-items-center">
+								<div class="d-flex flex-column align-items-end mr-2">
+									<span class="badge badge-primary mb-1">@job.Type</span>
+									@{
+										var applicationStatuses = ViewBag.ApplicationStatuses as Dictionary<int, ApplicationStatus>;
+										var status = applicationStatuses?.GetValueOrDefault(job.Id);
+									}
+									@if (status == ApplicationStatus.Hired)
+									{
+										<span class="badge badge-success">Hired</span>
+									}
+									else if (status == ApplicationStatus.Rejected)
+									{
+										<span class="badge badge-danger">Rejected</span>
+									}
+									else if (status == ApplicationStatus.Pending)
+									{
+										<span class="badge badge-warning">Pending</span>
+									}
+								</div>
+								@{
+									var canGiveFeedback = status == ApplicationStatus.Hired || status == ApplicationStatus.Rejected;
+									var hasFeedback = ViewBag.FeedbackGivenJobs != null && ((HashSet<int>)ViewBag.FeedbackGivenJobs).Contains(job.Id);
+								}
+								@if (canGiveFeedback)
+								{
+									<div class="dropdown">
+										<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu@(job.Id)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<i class="fas fa-ellipsis-v"></i>
+										</button>
+										<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu@(job.Id)">
+											@if (hasFeedback)
+											{
+												<span class="dropdown-item-text text-success">
+													<i class="fas fa-check-circle"></i> Feedback Given
+												</span>
+											}
+											else
+											{
+												<a class="dropdown-item" href="#" onclick="openFeedbackModal(@job.Id, '@job.Title', '@status')">
+													<i class="fas fa-comment"></i> Give Feedback
+												</a>
+											}
+										</div>
+									</div>
+								}
+							</div>
 						</div>
 						<p class="text-muted mb-2">
 							<i class="fas fa-map-marker-alt mr-1"></i>@(string.IsNullOrWhiteSpace(job.Location) ? "Remote/NA" : job.Location)
@@ -63,5 +116,120 @@ else
 		}
 	</div>
 }
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="feedbackModalLabel">Give Feedback</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form id="feedbackForm" method="post" asp-controller="StudentFeedback" asp-action="Create">
+				<div class="modal-body">
+					<input type="hidden" id="applicationId" name="applicationId" />
+					
+					<div class="mb-3">
+						<strong>Job:</strong> <span id="jobTitle"></span><br>
+						<strong>Status:</strong> <span id="jobStatus"></span>
+					</div>
+
+
+					<div class="form-group">
+						<label for="rating">Rating <span class="text-danger">*</span></label>
+						<div class="rating-input">
+							<div class="star-rating">
+								<input type="radio" id="star5" name="rating" value="5" required>
+								<label for="star5" class="star">★</label>
+								<input type="radio" id="star4" name="rating" value="4">
+								<label for="star4" class="star">★</label>
+								<input type="radio" id="star3" name="rating" value="3">
+								<label for="star3" class="star">★</label>
+								<input type="radio" id="star2" name="rating" value="2">
+								<label for="star2" class="star">★</label>
+								<input type="radio" id="star1" name="rating" value="1">
+								<label for="star1" class="star">★</label>
+							</div>
+							<small class="text-muted">Rate your experience with this company (1 = Poor, 5 = Excellent)</small>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="message">Message <span class="text-danger">*</span></label>
+						<textarea class="form-control" id="message" name="message" rows="4" 
+								  placeholder="Share your detailed feedback about the application process, interview experience, communication, etc." 
+								  maxlength="2000" required></textarea>
+						<small class="text-muted">Maximum 2000 characters</small>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-primary">
+						<i class="fas fa-paper-plane"></i> Submit Feedback
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<style>
+	.rating-input {
+		margin-bottom: 1rem;
+	}
+	
+	.star-rating {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: flex-start;
+		margin-bottom: 0.5rem;
+	}
+	
+	.star-rating input {
+		display: none;
+	}
+	
+	.star-rating label {
+		font-size: 2rem;
+		color: #ddd;
+		cursor: pointer;
+		transition: color 0.2s;
+		margin-right: 5px;
+	}
+	
+	.star-rating input:checked ~ label,
+	.star-rating label:hover,
+	.star-rating label:hover ~ label {
+		color: #ffc107;
+	}
+	
+	.star-rating input:checked ~ label {
+		color: #ffc107;
+	}
+</style>
+
+<script>
+	function openFeedbackModal(jobId, jobTitle, status) {
+		// Get application ID for this job
+		fetch('/StudentFeedback/GetApplicationId?jobId=' + jobId)
+			.then(response => response.json())
+			.then(data => {
+				if (data.applicationId) {
+					document.getElementById('applicationId').value = data.applicationId;
+					document.getElementById('jobTitle').textContent = jobTitle;
+					document.getElementById('jobStatus').textContent = status;
+					$('#feedbackModal').modal('show');
+				} else {
+					alert('Application not found');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('Error loading application details');
+			});
+	}
+</script>
 
 

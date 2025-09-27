@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PlacementManagementSystem.Data;
 using PlacementManagementSystem.Models;
+using PlacementManagementSystem.Hubs;
 
 namespace PlacementManagementSystem
 {
@@ -44,6 +45,7 @@ namespace PlacementManagementSystem
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -72,6 +74,7 @@ namespace PlacementManagementSystem
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }

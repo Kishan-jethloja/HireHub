@@ -1,0 +1,20 @@
+@model PlacementManagementSystem.Models.Announcement
+@{
+	ViewData["Title"] = "Announcement";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h2 class="mb-0">@Model.Title</h2>
+	<a class="btn btn-outline-primary" asp-controller="Student" asp-action="Announcements">Back to Announcements</a>
+</div>
+
+<p class="text-muted mb-1">
+	<strong>@(ViewBag.CompanyName ?? "Company")</strong>
+	<span class="ml-2">@Model.CreatedAtUtc.ToLocalTime().ToString("f")</span>
+</p>
+
+<div class="card shadow-sm">
+	<div class="card-body">
+		@Model.Message
+	</div>
+</div>

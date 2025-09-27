@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PlacementManagementSystem.Data;
 using PlacementManagementSystem.Models;
 using Microsoft.AspNetCore.Identity;
@@ -362,5 +363,67 @@ namespace PlacementManagementSystem.Controllers
 			TempData["Success"] = "Job posting deleted successfully.";
 			return RedirectToAction("MyJobs");
 		}
+
+		public async Task<IActionResult> Feedback(int? jobId = null)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user?.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			// Get company's feedback
+			var company = await _db.Companies.FirstOrDefaultAsync(c => c.UserId == user.Id);
+			if (company == null)
+			{
+				return NotFound();
+			}
+
+			// Get job title if filtering by specific job
+			string jobTitle = null;
+			if (jobId.HasValue)
+			{
+				var job = await _db.JobPostings.FirstOrDefaultAsync(j => j.Id == jobId.Value && j.CompanyUserId == user.Id);
+				if (job == null)
+				{
+					return NotFound();
+				}
+				jobTitle = job.Title;
+			}
+
+			var feedbackQuery = _db.Feedbacks
+				.Where(f => f.TargetCompanyId == company.Id);
+
+			// Filter by specific job if jobId is provided
+			if (jobId.HasValue)
+			{
+				// Only show feedback for this specific job
+				feedbackQuery = feedbackQuery.Where(f => f.JobPostingId == jobId.Value);
+			}
+
+			var feedback = await feedbackQuery
+				.Include(f => f.AuthorUser)
+				.Include(f => f.JobPosting)
+				.OrderByDescending(f => f.CreatedAtUtc)
+				.Select(f => new FeedbackViewModel
+				{
+					Id = f.Id,
+					Subject = f.Subject,
+					Message = f.Message,
+					Rating = f.Rating,
+					CreatedAt = f.CreatedAtUtc,
+					AuthorName = $"{f.AuthorUser.FirstName} {f.AuthorUser.LastName}".Trim() != "" 
+						? $"{f.AuthorUser.FirstName} {f.AuthorUser.LastName}".Trim()
+						: f.AuthorUser.Email,
+					JobTitle = f.JobPosting != null ? f.JobPosting.Title : (jobTitle ?? "General Feedback"),
+					ApplicationStatus = "N/A" // Temporarily disabled
+				})
+				.ToListAsync();
+
+			ViewBag.JobTitle = jobTitle;
+			ViewBag.IsFilteredByJob = jobId.HasValue;
+			return View(feedback);
+		}
+
 	}
 }

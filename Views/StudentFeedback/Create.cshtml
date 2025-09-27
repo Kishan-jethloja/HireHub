@@ -1,0 +1,161 @@
+@{
+    ViewData["Title"] = "Give Feedback";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Give Feedback</h2>
+                <a class="btn btn-outline-primary" asp-action="Index">Back to Feedback</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Application Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Job Title:</strong> @ViewBag.JobTitle
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Company:</strong> @ViewBag.CompanyName
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <strong>Status:</strong> 
+                            @if (ViewBag.Status == ApplicationStatus.Hired)
+                            {
+                                <span class="badge badge-success">Hired</span>
+                            }
+                            else if (ViewBag.Status == ApplicationStatus.Rejected)
+                            {
+                                <span class="badge badge-danger">Rejected</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Your Feedback</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="Create">
+                        <input type="hidden" name="applicationId" value="@ViewBag.Application.Id" />
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="subject" name="subject" 
+                                   placeholder="Brief subject for your feedback" maxlength="150" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rating">Rating <span class="text-danger">*</span></label>
+                            <div class="rating-input">
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="rating" value="5" required>
+                                    <label for="star5" class="star">★</label>
+                                    <input type="radio" id="star4" name="rating" value="4">
+                                    <label for="star4" class="star">★</label>
+                                    <input type="radio" id="star3" name="rating" value="3">
+                                    <label for="star3" class="star">★</label>
+                                    <input type="radio" id="star2" name="rating" value="2">
+                                    <label for="star2" class="star">★</label>
+                                    <input type="radio" id="star1" name="rating" value="1">
+                                    <label for="star1" class="star">★</label>
+                                </div>
+                                <small class="text-muted">Rate your experience with this company (1 = Poor, 5 = Excellent)</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="message" name="message" rows="6" 
+                                      placeholder="Share your detailed feedback about the application process, interview experience, communication, etc." 
+                                      maxlength="2000" required></textarea>
+                            <small class="text-muted">Maximum 2000 characters</small>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Submit Feedback
+                            </button>
+                            <a class="btn btn-secondary ml-2" asp-action="Index">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">Feedback Guidelines</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <strong>Be Honest:</strong> Share your genuine experience
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <strong>Be Constructive:</strong> Help other students with your insights
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <strong>Be Professional:</strong> Keep feedback respectful and constructive
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            <strong>Be Specific:</strong> Mention details about the process
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-input {
+        margin-bottom: 1rem;
+    }
+    
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        margin-bottom: 0.5rem;
+    }
+    
+    .star-rating input {
+        display: none;
+    }
+    
+    .star-rating label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+        margin-right: 5px;
+    }
+    
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #ffc107;
+    }
+    
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+    }
+</style>

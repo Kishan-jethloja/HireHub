@@ -18,6 +18,7 @@ namespace PlacementManagementSystem.Data
 		public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Application> Applications { get; set; }
         public DbSet<College> Colleges { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -54,10 +55,23 @@ namespace PlacementManagementSystem.Data
                 .HasForeignKey(f => f.AuthorUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Temporarily disabled until ApplicationId column is added
+            // builder.Entity<Feedback>()
+            //     .HasOne(f => f.Application)
+            //     .WithMany()
+            //     .HasForeignKey(f => f.ApplicationId)
+            //     .OnDelete(DeleteBehavior.SetNull);
+
             builder.Entity<Feedback>()
                 .HasOne(f => f.TargetCompany)
                 .WithMany()
                 .HasForeignKey(f => f.TargetCompanyId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<Feedback>()
+                .HasOne(f => f.JobPosting)
+                .WithMany()
+                .HasForeignKey(f => f.JobPostingId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.Entity<JobPosting>()

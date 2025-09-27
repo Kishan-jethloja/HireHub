@@ -46,13 +46,14 @@
                         else if (currentUser.UserType == UserType.Student)
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Jobs</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Announcements">Announcements</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Chat" asp-action="Index">Chat</a></li>
                         }
                         else if (currentUser.UserType == UserType.Company)
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="MyJobs">Jobs</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="Feedback">Feedback</a></li>
                         }
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Feedback">Feedback</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     </ul>
                     <div class="navbar-nav">
                         <partial name="_LoginPartial" />

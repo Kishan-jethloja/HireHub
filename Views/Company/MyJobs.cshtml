@@ -37,6 +37,9 @@
 											<i class="fas fa-ellipsis-v"></i>
 										</button>
 										<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton@j.Id">
+											<a class="dropdown-item" asp-controller="Company" asp-action="Feedback" asp-route-jobId="@j.Id">
+												<i class="fas fa-chart-line mr-2"></i>Feedback Analysis
+											</a>
 											<button class="dropdown-item text-danger" onclick="confirmDelete(@j.Id, '@j.Title')">
 												<i class="fas fa-trash mr-2"></i>Delete Job
 											</button>

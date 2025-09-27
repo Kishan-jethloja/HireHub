@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace PlacementManagementSystem.Controllers
 {
@@ -24,6 +26,60 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
+		public async Task<IActionResult> Announcements()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Student)
+			{
+				return Forbid();
+			}
+			var eligibleJobIds = _db.Applications
+				.Where(a => a.StudentUserId == user.Id && a.Status != ApplicationStatus.Rejected)
+				.Select(a => a.JobPostingId)
+				.Distinct()
+				.ToList();
+			var anns = _db.Announcements
+				.Where(a => eligibleJobIds.Contains(a.JobPostingId))
+				.Include(a => a.CompanyUser)
+				.Include(a => a.JobPosting)
+				.OrderByDescending(a => a.CreatedAtUtc)
+				.ToList();
+			// Map CompanyUserId -> Company.CompanyName for display
+			var companyUserIds = anns.Select(a => a.CompanyUserId).Distinct().ToList();
+			var companyNames = _db.Companies
+				.Where(c => companyUserIds.Contains(c.UserId))
+				.ToDictionary(c => c.UserId, c => c.CompanyName);
+			ViewBag.CompanyNamesByUserId = companyNames;
+			return View(anns);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Announcement(int id)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Student)
+			{
+				return Forbid();
+			}
+			var ann = _db.Announcements
+				.Include(a => a.CompanyUser)
+				.Include(a => a.JobPosting)
+				.FirstOrDefault(a => a.Id == id);
+			if (ann == null)
+			{
+				return NotFound();
+			}
+			// Authorization: student must have a non-rejected application for this job
+			bool eligible = _db.Applications.Any(a => a.JobPostingId == ann.JobPostingId && a.StudentUserId == user.Id && a.Status != ApplicationStatus.Rejected);
+			if (!eligible)
+			{
+				return Forbid();
+			}
+			// Company display name map for the view
+			var name = _db.Companies.Where(c => c.UserId == ann.CompanyUserId).Select(c => c.CompanyName).FirstOrDefault();
+			ViewBag.CompanyName = string.IsNullOrWhiteSpace(name) ? ann.CompanyUser?.FullName : name;
+			return View(ann);
+		}
 		public async Task<IActionResult> Apply(int id)
 		{
 			var user = await _userManager.GetUserAsync(User);
@@ -167,6 +223,19 @@ namespace PlacementManagementSystem.Controllers
 				.Select(a => a.JobPostingId)
 				.ToHashSet();
 			ViewBag.AppliedJobIds = appliedJobIds;
+
+			// Get application status for each job
+			var applicationStatuses = _db.Applications
+				.Where(a => a.StudentUserId == user.Id)
+				.ToDictionary(a => a.JobPostingId, a => a.Status);
+			ViewBag.ApplicationStatuses = applicationStatuses;
+
+			// Get jobs where feedback has been given
+			var feedbackGivenJobs = _db.Feedbacks
+				.Where(f => f.AuthorUserId == user.Id && f.JobPostingId != null)
+				.Select(f => f.JobPostingId.Value)
+				.ToHashSet();
+			ViewBag.FeedbackGivenJobs = feedbackGivenJobs;
 
 			return View(jobs);
 		}

@@ -1,0 +1,258 @@
+@model List<PlacementManagementSystem.Models.ChatMessageViewModel>
+@{
+    ViewData["Title"] = "Student Chat";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Student Chat</h2>
+                <div class="text-muted">
+                    <i class="fas fa-university"></i> College Students Only
+                </div>
+            </div>
+            
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> @ViewBag.ErrorMessage
+                </div>
+            }
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <!-- Chat Messages Area -->
+                    <div id="chatMessages" class="chat-messages" style="height: 500px; overflow-y: auto; padding: 20px;">
+                        @if (Model != null)
+                        {
+                            @foreach (var msg in Model)
+                            {
+                                <div class="message @(msg.IsOwnMessage ? "own-message" : "other-message")" data-message-id="@msg.Id">
+                                    <div class="message-header">
+                                        <strong class="sender-name">@msg.SenderName</strong>
+                                        <small class="text-muted">@msg.SentAt.ToLocalTime().ToString("g")</small>
+                                        @if (msg.IsOwnMessage)
+                                        {
+                                            <button class="btn btn-sm btn-outline-danger delete-message" data-message-id="@msg.Id" title="Delete message">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                    <div class="message-content">@msg.Message</div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    
+                    <!-- Message Input Area -->
+                    <div class="message-input-area p-3 border-top">
+                        <form id="messageForm" class="d-flex">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Type your message..." maxlength="1000" required>
+                            <button type="submit" class="btn btn-primary ml-2">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </form>
+                        <small class="text-muted">Press Enter to send, Shift+Enter for new line</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-messages {
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+        display: flex;
+        flex-direction: column;
+        word-wrap: break-word;
+    }
+    
+    .own-message {
+        background-color: #007bff;
+        color: white;
+        margin-left: auto;
+        align-self: flex-end;
+    }
+    
+    .other-message {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        align-self: flex-start;
+    }
+    
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .other-message .message-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .sender-name {
+        font-size: 0.9em;
+        font-weight: 600;
+    }
+    
+    .message-content {
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        margin-top: 4px;
+        line-height: 1.4;
+    }
+    
+    .text-muted {
+        font-size: 0.8em;
+        margin-left: 8px;
+    }
+    
+    .delete-message {
+        padding: 2px 6px;
+        font-size: 0.7em;
+    }
+    
+    .message-input-area {
+        background-color: white;
+    }
+    
+    #messageInput {
+        border-radius: 20px;
+        border: 1px solid #ced4da;
+    }
+    
+    #messageInput:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        const currentUserId = '@ViewBag.CurrentUserId';
+        const chatMessages = document.getElementById('chatMessages');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Add message to chat
+        function addMessage(message) {
+            const messageDiv = document.createElement('div');
+            const isOwnMessage = message.senderUserId === currentUserId;
+            
+            messageDiv.className = `message ${isOwnMessage ? 'own-message' : 'other-message'}`;
+            messageDiv.setAttribute('data-message-id', message.id);
+            
+            const sentAt = new Date(message.sentAt);
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <strong class="sender-name">${message.senderName}</strong>
+                    <small class="text-muted">${sentAt.toLocaleString()}</small>
+                    ${isOwnMessage ? `<button class="btn btn-sm btn-outline-danger delete-message" data-message-id="${message.id}" title="Delete message">
+                        <i class="fas fa-trash"></i>
+                    </button>` : ''}
+                </div>
+                <div class="message-content">${message.message}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Remove message from chat
+        function removeMessage(messageId) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.remove();
+            }
+        }
+
+        // Start SignalR connection
+        connection.start().then(function () {
+            console.log("Connected to chat hub");
+            connection.invoke("JoinChat");
+        }).catch(function (err) {
+            console.error("Error connecting to chat hub: " + err.toString());
+        });
+
+        // Handle receiving messages
+        connection.on("ReceiveMessage", function (message) {
+            addMessage(message);
+        });
+
+        // Handle message deletion
+        connection.on("MessageDeleted", function (messageId) {
+            removeMessage(messageId);
+        });
+
+        // Handle errors
+        connection.on("Error", function (error) {
+            alert("Error: " + error);
+        });
+
+        // Handle form submission
+        messageForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message) {
+                connection.invoke("SendMessage", message).catch(function (err) {
+                    console.error("Error sending message: " + err.toString());
+                });
+                messageInput.value = '';
+            }
+        });
+
+        // Handle Enter key (send) vs Shift+Enter (new line)
+        messageInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                messageForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Handle delete message buttons
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.delete-message')) {
+                const messageId = e.target.closest('.delete-message').getAttribute('data-message-id');
+                if (confirm('Are you sure you want to delete this message?')) {
+                    connection.invoke("DeleteMessage", parseInt(messageId)).catch(function (err) {
+                        console.error("Error deleting message: " + err.toString());
+                    });
+                }
+            }
+        });
+
+        // Scroll to bottom on page load
+        window.addEventListener('load', function () {
+            scrollToBottom();
+        });
+    </script>
+}

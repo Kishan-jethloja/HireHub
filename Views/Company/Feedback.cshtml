@@ -1,0 +1,152 @@
+@using System.Linq
+@model List<PlacementManagementSystem.Models.FeedbackViewModel>
+@{
+    ViewData["Title"] = "Company Feedback";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="mb-0">Feedback Received</h2>
+                    @if (ViewBag.IsFilteredByJob == true && ViewBag.JobTitle != null)
+                    {
+                        <small class="text-muted">For: <strong>@ViewBag.JobTitle</strong></small>
+                    }
+                </div>
+                <div class="d-flex align-items-center">
+                    @if (ViewBag.IsFilteredByJob == true)
+                    {
+                        <a class="btn btn-outline-secondary btn-sm mr-2" asp-controller="Company" asp-action="MyJobs">
+                            <i class="fas fa-arrow-left"></i> Back to Jobs
+                        </a>
+                    }
+                    <div class="text-muted">
+                        <i class="fas fa-star"></i> Student Feedback
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            Student Feedback
+                            @if (ViewBag.IsFilteredByJob == true && ViewBag.JobTitle != null)
+                            {
+                                <span class="text-muted">- @ViewBag.JobTitle</span>
+                            }
+                        </h5>
+                        <small class="text-muted">
+                            @if (ViewBag.IsFilteredByJob == true)
+                            {
+                                <text>Feedback from students who applied to this specific job</text>
+                            }
+                            else
+                            {
+                                <text>Feedback from students who applied to your jobs</text>
+                            }
+                        </small>
+                    </div>
+                    <div class="card-body p-0">
+                        @foreach (var item in Model)
+                        {
+                            <div class="border-bottom p-4">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">@item.Subject</h6>
+                                                <p class="text-muted mb-2">@item.Message</p>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="text-muted mr-3">
+                                                        <i class="fas fa-user"></i> @item.AuthorName
+                                                    </span>
+                                                    <span class="text-muted mr-3">
+                                                        <i class="fas fa-briefcase"></i> @item.JobTitle
+                                                    </span>
+                                                    <span class="text-muted">
+                                                        <i class="fas fa-clock"></i> @item.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-right">
+                                            <div class="rating-display mb-2">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= item.Rating)
+                                                    {
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star text-muted"></i>
+                                                    }
+                                                }
+                                                <span class="ml-2 text-muted">(@item.Rating/5)</span>
+                                            </div>
+                                            <div class="status-badge">
+                                                @if (item.ApplicationStatus == "Hired")
+                                                {
+                                                    <span class="badge badge-success">Hired</span>
+                                                }
+                                                else if (item.ApplicationStatus == "Rejected")
+                                                {
+                                                    <span class="badge badge-danger">Rejected</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-secondary">@item.ApplicationStatus</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-comment-alt fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Feedback Yet</h4>
+                        @if (ViewBag.IsFilteredByJob == true && ViewBag.JobTitle != null)
+                        {
+                            <p class="text-muted">No feedback has been received for <strong>@ViewBag.JobTitle</strong> yet.</p>
+                            <p class="text-muted">Students will be able to provide feedback after their applications are accepted or rejected.</p>
+                        }
+                        else
+                        {
+                            <p class="text-muted">You'll receive feedback from students after they apply and their applications are decided.</p>
+                        }
+                        <a class="btn btn-primary" asp-controller="Company" asp-action="MyJobs">
+                            <i class="fas fa-briefcase"></i> Manage Jobs
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-display {
+        font-size: 1.1rem;
+    }
+    
+    .status-badge {
+        margin-top: 0.5rem;
+    }
+</style>

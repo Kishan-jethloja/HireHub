@@ -18,6 +18,14 @@ namespace PlacementManagementSystem.Models
 		public string AuthorUserId { get; set; }
 		public ApplicationUser AuthorUser { get; set; }
 
+		// Link to application (required for company feedback) - temporarily disabled
+		// public int? ApplicationId { get; set; }
+		// public Application Application { get; set; }
+		
+		// Link to job posting for filtering feedback by job
+		public int? JobPostingId { get; set; }
+		public JobPosting JobPosting { get; set; }
+
 		// Target info
 		[Required]
 		public FeedbackTargetType TargetType { get; set; }

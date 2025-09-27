@@ -1,0 +1,34 @@
+@model IEnumerable<PlacementManagementSystem.Models.Announcement>
+@{
+    ViewData["Title"] = "Announcements";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Announcements</h2>
+    <a class="btn btn-outline-primary" asp-controller="Student" asp-action="Jobs">Back to Jobs</a>
+    </div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No announcements yet.</div>
+}
+else
+{
+    <div class="list-group">
+        @{
+            var names = (System.Collections.Generic.IDictionary<string, string>)ViewBag.CompanyNamesByUserId ?? new System.Collections.Generic.Dictionary<string, string>();
+        }
+        @foreach (var a in Model)
+        {
+            var companyName = names.ContainsKey(a.CompanyUserId) ? names[a.CompanyUserId] : (a.CompanyUser != null ? a.CompanyUser.FullName : "Company");
+            <a class="list-group-item list-group-item-action" asp-controller="Student" asp-action="Announcement" asp-route-id="@a.Id">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><strong>@a.Title</strong> <span class="text-muted">- @companyName</span></span>
+                    <small class="text-muted">@a.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+
