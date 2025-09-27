@@ -33,7 +33,6 @@
 							<label asp-for="CollegeName">Target College</label>
 							<select asp-for="CollegeName" class="form-control">
 								<option value="">Select College</option>
-								<option value="All Colleges">All Colleges</option>
 								@if (ViewBag.Colleges != null)
 								{
 									@foreach (var collegeName in ViewBag.Colleges)
@@ -47,7 +46,7 @@
 
 						<div class="form-group">
 							<label asp-for="Title"></label>
-							<input asp-for="Title" class="form-control" placeholder="Job/Internship Title" />
+							<input asp-for="Title" class="form-control" placeholder="e.g., Software Developer, Data Analyst, Marketing Intern" />
 							<span asp-validation-for="Title" class="text-danger"></span>
 						</div>
 

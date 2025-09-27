@@ -7,7 +7,7 @@
 	<div class="col-12 mb-3">
 		<h2 class="mb-0">Apply to @ViewBag.Job?.Title</h2>
 		<p class="text-muted">
-			@ViewBag.Job?.CollegeName • @ViewBag.Job?.Type • @(ViewBag.Job?.Location ?? "Remote/NA")
+			@ViewBag.CompanyName • @ViewBag.Job?.Type • @(ViewBag.Job?.Location ?? "Remote/NA")
 			@if (ViewBag.Job?.MinimumCPI != null)
 			{
 				<span class="badge badge-info ml-2">Min CPI: @ViewBag.Job.MinimumCPI</span>
@@ -42,10 +42,8 @@
 					<label asp-for="Gender">Gender</label>
 					<select asp-for="Gender" class="form-control">
 						<option value="">Select</option>
-						<option>Female</option>
 						<option>Male</option>
-						<option>Non-binary</option>
-						<option>Prefer not to say</option>
+						<option>Female</option>
 					</select>
 					<span asp-validation-for="Gender" class="text-danger"></span>
 				</div>

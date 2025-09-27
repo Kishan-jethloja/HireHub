@@ -43,6 +43,11 @@ namespace PlacementManagementSystem.Controllers
 			{
 				return Forbid();
 			}
+
+			// UserId comes from the logged-in user, not the form
+			ModelState.Remove("UserId");
+			ModelState.Remove("Id");
+
 			if (!ModelState.IsValid)
 			{
 				return View(model);

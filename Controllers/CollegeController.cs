@@ -145,6 +145,39 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
+		public IActionResult JobDetails(int id)
+		{
+			var user = _userManager.GetUserAsync(User).Result;
+			if (user == null || user.UserType != UserType.College)
+			{
+				return Forbid();
+			}
+
+			var ownedCollege = _db.Colleges.FirstOrDefault(c => c.CollegeUserId == user.Id)?.Name;
+			if (string.IsNullOrWhiteSpace(ownedCollege))
+			{
+				TempData["Error"] = "Set up your college profile first.";
+				return RedirectToAction("Profile");
+			}
+
+			var job = _db.JobPostings
+				.Include(j => j.CompanyUser)
+				.FirstOrDefault(j => j.Id == id && (j.CollegeName == ownedCollege || j.CollegeName == "All Colleges"));
+
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			// Get company name
+			var companyName = _db.Companies.FirstOrDefault(c => c.UserId == job.CompanyUserId)?.CompanyName ?? "(Unknown)";
+			ViewBag.CompanyName = companyName;
+			ViewBag.College = ownedCollege;
+
+			return View(job);
+		}
+
+		[HttpGet]
 		public IActionResult Profile()
 		{
 			var user = _userManager.GetUserAsync(User).Result;

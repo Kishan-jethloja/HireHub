@@ -84,14 +84,125 @@
 }
 else
 {
-    <div class="text-center">
-        <h1 class="display-4">Welcome to HireHub</h1>
-        <p>Empowering Students & Companies</p>
-        <p>Connect talented students with leading companies through our comprehensive placement management platform.</p>
-        
-        <div class="mt-4">
-            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Get Started</a>
-            <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
+    <!-- Hero Section -->
+    <div class="hero-section bg-gradient-primary text-white py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 font-weight-bold mb-4">Welcome to HireHub</h1>
+                    <p class="lead mb-4">Empowering Students & Companies</p>
+                    <p class="mb-4">Connect talented students with leading companies through our comprehensive placement management platform. Streamline your hiring process and discover your dream career.</p>
+                    
+                    <div class="mt-4">
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg mr-3">Get Started</a>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Login</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-handshake fa-10x opacity-75"></i>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Features Section -->
+    <div class="container py-5">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 font-weight-bold mb-3">Why Choose HireHub?</h2>
+                <p class="lead text-muted">Comprehensive solutions for modern placement management</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-users fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">For Students</h5>
+                        <p class="card-text">Discover job opportunities, track applications, get real-time updates, and connect with peers through our college-specific chat system.</p>
+                        <ul class="list-unstyled text-left">
+                            <li><i class="fas fa-check text-success mr-2"></i>Browse job postings</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Real-time chat with peers</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Application tracking</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Feedback system</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-building fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">For Companies</h5>
+                        <p class="card-text">Post jobs, manage applications, analyze feedback, and find the perfect candidates for your organization.</p>
+                        <ul class="list-unstyled text-left">
+                            <li><i class="fas fa-check text-success mr-2"></i>Post job openings</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Manage applications</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Feedback analysis</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Candidate insights</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">For Colleges</h5>
+                        <p class="text-muted">Manage student profiles, approve applications, and track placement statistics for your institution.</p>
+                        <ul class="list-unstyled text-left">
+                            <li><i class="fas fa-check text-success mr-2"></i>Student management</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Application approval</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Placement tracking</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Statistics dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CTA Section -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="display-5 font-weight-bold mb-4">Ready to Get Started?</h2>
+                <p class="lead text-muted mb-4">Join thousands of students and companies already using HireHub</p>
+                <div class="mt-4">
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg mr-3">Create Account</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-lg">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom CSS for enhanced styling -->
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .feature-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+        
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
 }

@@ -92,7 +92,11 @@ namespace PlacementManagementSystem.Controllers
 			{
 				return NotFound();
 			}
+			
+			// Get company name
+			var companyName = _db.Companies.FirstOrDefault(c => c.UserId == job.CompanyUserId)?.CompanyName ?? "Unknown Company";
 			ViewBag.Job = job;
+			ViewBag.CompanyName = companyName;
 			var existing = _db.Applications.FirstOrDefault(a => a.JobPostingId == id && a.StudentUserId == user.Id);
 			// Announcements for this job
 			ViewBag.Announcements = _db.Announcements
@@ -105,7 +109,28 @@ namespace PlacementManagementSystem.Controllers
 			{
 				return View(existing);
 			}
-			return View(new Application());
+
+			// Pre-populate form with student profile data
+			var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id);
+			var application = new Application();
+			
+			if (student != null)
+			{
+				// Pre-fill with student profile data
+				application.ApplicantName = user.FullName;
+				application.ApplicantEmail = user.Email;
+				application.CollegeId = student.StudentId; // Use StudentId as CollegeId
+				
+				// Cover letter remains blank for students to fill manually
+			}
+			else
+			{
+				// Fallback to user data if student profile not found
+				application.ApplicantName = user.FullName;
+				application.ApplicantEmail = user.Email;
+			}
+
+			return View(application);
 		}
 
 		[HttpPost]
@@ -135,6 +160,9 @@ namespace PlacementManagementSystem.Controllers
 			if (!ModelState.IsValid)
 			{
 				ViewBag.Job = job;
+				// Get company name for validation error display
+				var companyName = _db.Companies.FirstOrDefault(c => c.UserId == job.CompanyUserId)?.CompanyName ?? "Unknown Company";
+				ViewBag.CompanyName = companyName;
 				// Repopulate announcements and current status on validation error
 				var current = _db.Applications.FirstOrDefault(a => a.JobPostingId == job.Id && a.StudentUserId == user.Id);
 				ViewBag.Announcements = _db.Announcements

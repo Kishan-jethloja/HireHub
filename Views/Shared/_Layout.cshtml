@@ -23,36 +23,27 @@
                 </button>
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav mr-auto">
-                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         @{
                             var currentUser = SignInManager.IsSignedIn(User) ? UserManager.GetUserAsync(User).Result : null;
                         }
-                        @if (currentUser == null)
+                        @if (currentUser == null || currentUser.UserType != UserType.Student)
                         {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Students</a></li>
-                        }
-                        else if (currentUser.UserType == UserType.College)
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="College" asp-action="Students">Students</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         }
                         @if (currentUser != null && currentUser.UserType == UserType.College)
                         {
+                            <li class="nav-item"><a class="nav-link" asp-controller="College" asp-action="Students">Students</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="College" asp-action="Companies">Companies</a></li>
                         }
-                        @if (currentUser == null)
+                        else if (currentUser != null && currentUser.UserType == UserType.Student)
                         {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Jobs</a></li>
-                        }
-                        else if (currentUser.UserType == UserType.Student)
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Jobs</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Jobs">Home</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Student" asp-action="Announcements">Announcements</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Chat" asp-action="Index">Chat</a></li>
                         }
-                        else if (currentUser.UserType == UserType.Company)
+                        else if (currentUser != null && currentUser.UserType == UserType.Company)
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="MyJobs">Jobs</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Company" asp-action="Feedback">Feedback</a></li>
                         }
                     </ul>
                     <div class="navbar-nav">

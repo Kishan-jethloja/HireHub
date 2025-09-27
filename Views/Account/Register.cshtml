@@ -49,6 +49,18 @@
                         </div>
 
                         <!-- Company specific fields -->
+                        <div id="companyFields" style="display: none;">
+                            <h4>Company Information</h4>
+
+                            <div class="form-group">
+                                <label class="form-label">Company Name</label>
+                                <input asp-for="CompanyName" class="form-control" autocomplete="organization" />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- College specific fields -->
                         <div id="collegeFields" style="display: none;">
                             <h4>College Information</h4>
 
@@ -93,6 +105,13 @@
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Register</button>
                         </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-0">
+                                Already have an account? 
+                                <a asp-controller="Account" asp-action="Login" class="text-primary font-weight-bold">Sign In</a>
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -105,6 +124,7 @@
     <script>
         // User type selection functionality
         var userTypeSelect = document.getElementById('userTypeSelect');
+        var companyFields = document.getElementById('companyFields');
         var collegeFields = document.getElementById('collegeFields');
         var commonFields = document.getElementById('commonFields');
         var nameFields = document.getElementById('nameFields');
@@ -112,6 +132,7 @@
 
         function updateVisibility() {
             var userType = userTypeSelect.value;
+            companyFields.style.display = 'none';
             collegeFields.style.display = 'none';
             commonFields.style.display = 'none';
             nameFields.style.display = 'none';
@@ -126,6 +147,10 @@
             // show name fields for Student only
             if (userType === '1') {
                 nameFields.style.display = 'block';
+            }
+            // show company fields for Company role
+            if (userType === '2') {
+                companyFields.style.display = 'block';
             }
             // show college fields only for College role
             if (userType === '3') {
