@@ -235,7 +235,14 @@ namespace PlacementManagementSystem.Controllers
 			// Block job listings until college has approved the student
 			if (!student.IsApproved)
 			{
-				TempData["Error"] = $"Pending college confirmation for {student.CollegeName}.";
+				if (student.CollegeName == "Unassigned")
+				{
+					TempData["Error"] = "Please choose your correct college. Your previous college registration was rejected.";
+				}
+				else
+				{
+					TempData["Error"] = $"Pending college confirmation for {student.CollegeName}.";
+				}
 				return RedirectToAction("Details");
 			}
 

@@ -22,7 +22,11 @@
 					<dd class="col-sm-8">@ViewBag.Email</dd>
 					<dt class="col-sm-4">College</dt>
 					<dd class="col-sm-8">
-						@if (!Model.IsApproved && !string.IsNullOrEmpty(Model.CollegeName) && Model.CollegeName != "Unassigned")
+						@if (Model.CollegeName == "Unassigned")
+						{
+							<span class="text-danger">Please choose your correct college</span>
+						}
+						else if (!Model.IsApproved && !string.IsNullOrEmpty(Model.CollegeName))
 						{
 							<span>@Model.CollegeName</span>
 							<span class="badge badge-warning ml-2">Pending confirmation</span>

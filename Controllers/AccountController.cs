@@ -103,12 +103,14 @@ namespace PlacementManagementSystem.Controllers
 						var existingCollege = _db.Colleges.FirstOrDefault(c => c.Name == model.CompanyName);
 						if (existingCollege == null && !string.IsNullOrWhiteSpace(model.CompanyName))
 						{
-							_db.Colleges.Add(new College
-							{
-								Name = model.CompanyName,
-								WebsiteUrl = model.Website,
-								CollegeUserId = user.Id
-							});
+						_db.Colleges.Add(new College
+						{
+							Name = model.CompanyName,
+							WebsiteUrl = model.Website,
+							City = model.City,
+							State = model.State,
+							CollegeUserId = user.Id
+						});
 							await _db.SaveChangesAsync();
 						}
 					}

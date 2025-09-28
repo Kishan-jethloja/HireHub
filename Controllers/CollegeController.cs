@@ -238,7 +238,24 @@ namespace PlacementManagementSystem.Controllers
 			}
 			student.IsApproved = true;
 			_db.SaveChanges();
+			TempData["Success"] = "Student approved successfully.";
 			return RedirectToAction("Students", new { college = student.CollegeName });
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public IActionResult RejectStudent(int id)
+		{
+			var student = _db.Students.FirstOrDefault(s => s.Id == id);
+			if (student == null)
+			{
+				return NotFound();
+			}
+			student.IsApproved = false;
+			student.CollegeName = "Unassigned"; // Reset college to unassigned
+			_db.SaveChanges();
+			TempData["Success"] = "Student rejected successfully. They need to choose their correct college.";
+			return RedirectToAction("Students");
 		}
 	}
 }

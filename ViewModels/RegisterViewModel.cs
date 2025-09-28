@@ -74,5 +74,14 @@ namespace PlacementManagementSystem.ViewModels
         [StringLength(200)]
         [Display(Name = "Industry")]
         public string Industry { get; set; }
+
+        // College specific fields
+        [StringLength(100)]
+        [Display(Name = "City")]
+        public string City { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "State")]
+        public string State { get; set; }
     }
 }
