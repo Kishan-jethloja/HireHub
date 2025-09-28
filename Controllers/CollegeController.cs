@@ -236,8 +236,16 @@ namespace PlacementManagementSystem.Controllers
 			{
 				return NotFound();
 			}
+			
+			// Debug: Log before approval
+			System.Diagnostics.Debug.WriteLine($"Before approval - Student ID: {student.Id}, IsApproved: {student.IsApproved}, CollegeName: {student.CollegeName}");
+			
 			student.IsApproved = true;
 			_db.SaveChanges();
+			
+			// Debug: Log after approval
+			System.Diagnostics.Debug.WriteLine($"After approval - Student ID: {student.Id}, IsApproved: {student.IsApproved}, CollegeName: {student.CollegeName}");
+			
 			TempData["Success"] = "Student approved successfully.";
 			return RedirectToAction("Students", new { college = student.CollegeName });
 		}

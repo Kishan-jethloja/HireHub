@@ -40,6 +40,23 @@ namespace PlacementManagementSystem.Hubs
                 return;
             }
 
+            // Refresh student data to get latest college information
+            await _context.Entry(student).ReloadAsync();
+
+            // Check if student is approved by college
+            if (!student.IsApproved)
+            {
+                if (student.CollegeName == "Unassigned")
+                {
+                    await Clients.Caller.SendAsync("Error", "Please choose your correct college. Your previous college registration was rejected.");
+                }
+                else
+                {
+                    await Clients.Caller.SendAsync("Error", $"Chat access is restricted until college approval. Pending confirmation for {student.CollegeName}.");
+                }
+                return;
+            }
+
             var collegeName = student.CollegeName;
             if (string.IsNullOrWhiteSpace(collegeName) || collegeName == "Unassigned")
             {
@@ -47,6 +64,9 @@ namespace PlacementManagementSystem.Hubs
                 return;
             }
 
+            // Remove from any existing college groups first
+            await RemoveFromAllCollegeGroups();
+            
             // Join college-specific group
             var groupName = $"College_{collegeName.Replace(" ", "_")}";
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
@@ -133,6 +153,17 @@ namespace PlacementManagementSystem.Hubs
                 message.IsDeleted = true;
                 await _context.SaveChangesAsync();
                 await Clients.Group(groupName).SendAsync("MessageDeleted", messageId);
+            }
+        }
+
+        private async Task RemoveFromAllCollegeGroups()
+        {
+            // Get all college names and remove from all possible groups
+            var colleges = await _context.Colleges.Select(c => c.Name).ToListAsync();
+            foreach (var college in colleges)
+            {
+                var groupName = $"College_{college.Replace(" ", "_")}";
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
             }
         }
 

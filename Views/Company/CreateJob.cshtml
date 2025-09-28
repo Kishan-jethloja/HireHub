@@ -76,8 +76,9 @@
 						</div>
 
 						<div class="form-group">
-							<label asp-for="ApplyByUtc"></label>
-							<input asp-for="ApplyByUtc" type="date" class="form-control" />
+							<label asp-for="ApplyByUtc">Application Deadline</label>
+							<input asp-for="ApplyByUtc" type="date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+							<small class="form-text text-muted">Deadline cannot be in the past</small>
 							<span asp-validation-for="ApplyByUtc" class="text-danger"></span>
 						</div>
 

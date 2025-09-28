@@ -97,6 +97,12 @@ namespace PlacementManagementSystem.Controllers
 				return Forbid();
 			}
 
+			// Validate application deadline is not in the past
+			if (model.ApplyByUtc.HasValue && model.ApplyByUtc.Value.Date < DateTime.Today)
+			{
+				ModelState.AddModelError("ApplyByUtc", "Application deadline cannot be in the past.");
+			}
+
 			if (!ModelState.IsValid)
 			{
 				// Re-populate colleges dropdown on validation error

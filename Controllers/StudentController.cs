@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PlacementManagementSystem.Data;
 using PlacementManagementSystem.Models;
 using System.Linq;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace PlacementManagementSystem.Controllers
@@ -232,6 +232,12 @@ namespace PlacementManagementSystem.Controllers
 				return RedirectToAction("Profile");
 			}
 
+			// Refresh student data from database to get latest approval status
+			await _db.Entry(student).ReloadAsync();
+
+			// Debug: Log student approval status
+			System.Diagnostics.Debug.WriteLine($"Student ID: {student.Id}, IsApproved: {student.IsApproved}, CollegeName: {student.CollegeName}");
+			
 			// Block job listings until college has approved the student
 			if (!student.IsApproved)
 			{
@@ -306,6 +312,32 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
+		public async Task<IActionResult> CheckApprovalStatus()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null || user.UserType != UserType.Student)
+			{
+				return Forbid();
+			}
+
+			var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id);
+			if (student == null)
+			{
+				return Json(new { error = "Student not found" });
+			}
+
+			// Refresh from database
+			await _db.Entry(student).ReloadAsync();
+
+			return Json(new { 
+				studentId = student.Id, 
+				isApproved = student.IsApproved, 
+				collegeName = student.CollegeName,
+				userId = user.Id
+			});
+		}
+
+		[HttpGet]
 		public async Task<IActionResult> Details()
 		{
 			var user = await _userManager.GetUserAsync(User);
@@ -319,6 +351,15 @@ namespace PlacementManagementSystem.Controllers
 			{
 				TempData["Error"] = "Complete your profile first.";
 				return RedirectToAction("Profile");
+			}
+
+			// If student is approved, redirect to Jobs instead of showing Details
+			if (student.IsApproved)
+			{
+				// Clear any stale TempData that might be showing pending messages
+				TempData.Remove("Pending");
+				TempData.Remove("Error");
+				return RedirectToAction("Jobs");
 			}
 
 			ViewBag.FullName = user.FullName;
@@ -349,6 +390,8 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			var student = _db.Students.FirstOrDefault(s => s.UserId == user.Id);
+			var oldCollegeName = ""; // Store old college name for comparison
+			
 			if (student == null)
 			{
 				student = new Student
@@ -366,10 +409,21 @@ namespace PlacementManagementSystem.Controllers
 			}
 			else
 			{
-				// If college changed, reset approval
+				// Store old college name before updating
+				oldCollegeName = student.CollegeName;
+				
+				// If college changed, reset approval and clear old chat messages
 				if (student.CollegeName != model.CollegeName)
 				{
 					student.IsApproved = false;
+					
+					// Clear old chat messages when changing college
+					var oldMessages = _db.ChatMessages.Where(m => m.SenderUserId == user.Id).ToList();
+					if (oldMessages.Any())
+					{
+						_db.ChatMessages.RemoveRange(oldMessages);
+						System.Diagnostics.Debug.WriteLine($"Cleared {oldMessages.Count} old chat messages for user {user.Id}");
+					}
 				}
 				student.CollegeName = model.CollegeName;
 				// StudentId remains immutable once assigned
@@ -413,11 +467,22 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			await _db.SaveChangesAsync();
-			TempData["ProfileUpdated"] = true;
+			
 			if (!student.IsApproved && !string.IsNullOrEmpty(student.CollegeName) && student.CollegeName != "Unassigned")
 			{
 				TempData["Pending"] = $"Request sent to {student.CollegeName}. Awaiting approval.";
 			}
+			else
+			{
+				TempData["ProfileUpdated"] = true;
+			}
+			
+			// If college changed, redirect to chat with refresh to clear old messages
+			if (oldCollegeName != model.CollegeName)
+			{
+				return RedirectToAction("Index", "Chat", new { refresh = true });
+			}
+			
 			return RedirectToAction("Index", "Home");
 		}
 	}

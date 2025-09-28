@@ -44,7 +44,7 @@ namespace PlacementManagementSystem.Controllers
 					var user = await _userManager.FindByEmailAsync(model.Email);
 					if (user != null && user.UserType == UserType.Company)
 					{
-						return RedirectToAction("MyJobs", "Company");
+						return RedirectToAction("Index", "Home");
 					}
 					if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
 					{
@@ -75,9 +75,19 @@ namespace PlacementManagementSystem.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Register(RegisterViewModel model)
 		{
-
+			// Debug: Log model values
+			System.Diagnostics.Debug.WriteLine($"UserType: {model.UserType}");
+			System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
+			System.Diagnostics.Debug.WriteLine($"FirstName: {model.FirstName}");
+			System.Diagnostics.Debug.WriteLine($"LastName: {model.LastName}");
+			
+			// Debug: Log validation errors
 			if (!ModelState.IsValid)
 			{
+				foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+				{
+					System.Diagnostics.Debug.WriteLine($"Validation Error: {error.ErrorMessage}");
+				}
 				return View(model);
 			}
 
