@@ -81,6 +81,36 @@ namespace PlacementManagementSystem.Controllers
 			System.Diagnostics.Debug.WriteLine($"FirstName: {model.FirstName}");
 			System.Diagnostics.Debug.WriteLine($"LastName: {model.LastName}");
 			
+			// Conditional validation by user type
+			if (model.UserType == UserType.Student)
+			{
+				ModelState.Remove("CompanyName");
+				ModelState.Remove("City");
+				ModelState.Remove("State");
+			}
+			else if (model.UserType == UserType.Company)
+			{
+				ModelState.Remove("CompanyName"); // will be validated manually below
+				ModelState.Remove("City");
+				ModelState.Remove("State");
+				ModelState.Remove("FirstName");
+				ModelState.Remove("LastName");
+			}
+			else if (model.UserType == UserType.College)
+			{
+				ModelState.Remove("FirstName");
+				ModelState.Remove("LastName");
+			}
+
+			// Manual required checks by role
+			if (model.UserType == UserType.Company)
+			{
+				if (string.IsNullOrWhiteSpace(model.CompanyName))
+				{
+					ModelState.AddModelError("CompanyName", "Company Name is required.");
+				}
+			}
+
 			// Debug: Log validation errors
 			if (!ModelState.IsValid)
 			{
@@ -88,6 +118,14 @@ namespace PlacementManagementSystem.Controllers
 				{
 					System.Diagnostics.Debug.WriteLine($"Validation Error: {error.ErrorMessage}");
 				}
+				return View(model);
+			}
+
+			// Prevent duplicate email registration (unique UserName/Email)
+			var existingUser = _userManager.FindByEmailAsync(model.Email).Result;
+			if (existingUser != null)
+			{
+				ModelState.AddModelError("Email", "An account with this email already exists.");
 				return View(model);
 			}
 

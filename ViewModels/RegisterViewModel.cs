@@ -61,7 +61,6 @@ namespace PlacementManagementSystem.ViewModels
         public IFormFile ResumeFile { get; set; }
 
         // Company specific fields
-        [Required]
         [StringLength(200)]
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; }
@@ -79,12 +78,10 @@ namespace PlacementManagementSystem.ViewModels
         public string Industry { get; set; }
 
         // College specific fields
-        [Required]
         [StringLength(100)]
         [Display(Name = "City")]
         public string City { get; set; }
 
-        [Required]
         [StringLength(100)]
         [Display(Name = "State")]
         public string State { get; set; }
