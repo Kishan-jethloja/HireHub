@@ -1,0 +1,44 @@
+@model PlacementManagementSystem.Models.JobPosting
+@using PlacementManagementSystem.Models
+@{
+    ViewData["Title"] = "Job Details";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-1">@Model.Title</h2>
+            <div class="text-muted mb-3">
+                @ViewBag.CompanyName • @Model.Type • @(string.IsNullOrWhiteSpace(Model.Location) ? "Remote/NA" : Model.Location)
+            </div>
+            <div class="mb-3">
+                @if (Model.MinimumCPI.HasValue)
+                {
+                    <span class="badge badge-info mr-2">Min CPI: @Model.MinimumCPI</span>
+                }
+                @{
+                    var durationText = Model.Type == JobType.Internship && Model.DurationMonths.HasValue
+                        ? $"{Model.DurationMonths} mo"
+                        : (Model.Type == JobType.FullTime && Model.DurationYears.HasValue ? $"{Model.DurationYears} yr" : null);
+                }
+                @if (!string.IsNullOrEmpty(durationText))
+                {
+                    <span class="badge badge-secondary mr-2">Duration: @durationText</span>
+                }
+                <span class="badge badge-light">Apply by: @(Model.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</span>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p class="mb-0" style="white-space: pre-line;">@Model.Description</p>
+                    </div>
+                </div>
+            }
+
+            <a class="btn btn-link" asp-action="MyJobs">Back to My Jobs</a>
+        </div>
+    </div>
+</div>
+
+

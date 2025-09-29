@@ -24,19 +24,19 @@ namespace PlacementManagementSystem.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Forbid();
             }
 
             // Get applications where student has been accepted or rejected
-            var applications = await _context.Applications
+            var applications = _context.Applications
                 .Where(a => a.StudentUserId == user.Id && a.Status != ApplicationStatus.Pending)
                 .Include(a => a.JobPosting)
-                .ThenInclude(j => j.CompanyUser)
                 .Select(a => new
                 {
                     ApplicationId = a.Id,
@@ -49,26 +49,26 @@ namespace PlacementManagementSystem.Controllers
                     AppliedDate = a.CreatedAtUtc,
                     HasFeedback = _context.Feedbacks.Any(f => f.AuthorUserId == user.Id && f.JobPostingId == a.JobPostingId)
                 })
-                .ToListAsync();
+                .ToList();
 
             return View(applications);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create(int applicationId)
+        public IActionResult Create(int applicationId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Forbid();
             }
 
             // Verify the application belongs to the student and is decided
-            var application = await _context.Applications
+            var application = _context.Applications
                 .Where(a => a.Id == applicationId && a.StudentUserId == user.Id && a.Status != ApplicationStatus.Pending)
                 .Include(a => a.JobPosting)
-                .ThenInclude(j => j.CompanyUser)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (application == null)
             {
@@ -76,8 +76,8 @@ namespace PlacementManagementSystem.Controllers
             }
 
             // Check if feedback already exists
-            var existingFeedback = await _context.Feedbacks
-                .FirstOrDefaultAsync(f => f.AuthorUserId == user.Id);
+            var existingFeedback = _context.Feedbacks
+                .FirstOrDefault(f => f.AuthorUserId == user.Id);
 
             if (existingFeedback != null)
             {
@@ -86,10 +86,10 @@ namespace PlacementManagementSystem.Controllers
             }
 
             // Get company name
-            var companyName = await _context.Companies
+            var companyName = _context.Companies
                 .Where(c => c.UserId == application.JobPosting.CompanyUserId)
                 .Select(c => c.CompanyName)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             ViewBag.Application = application;
             ViewBag.CompanyName = companyName;
@@ -100,20 +100,20 @@ namespace PlacementManagementSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int applicationId, string message, int rating)
+        public IActionResult Create(int applicationId, string message, int rating)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Forbid();
             }
 
             // Verify the application belongs to the student and is decided
-            var application = await _context.Applications
+            var application = _context.Applications
                 .Where(a => a.Id == applicationId && a.StudentUserId == user.Id && a.Status != ApplicationStatus.Pending)
                 .Include(a => a.JobPosting)
-                .ThenInclude(j => j.CompanyUser)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (application == null)
             {
@@ -121,8 +121,8 @@ namespace PlacementManagementSystem.Controllers
             }
 
             // Check if feedback already exists for this specific job
-            var existingFeedback = await _context.Feedbacks
-                .FirstOrDefaultAsync(f => f.AuthorUserId == user.Id && f.JobPostingId == application.JobPostingId);
+            var existingFeedback = _context.Feedbacks
+                .FirstOrDefault(f => f.AuthorUserId == user.Id && f.JobPostingId == application.JobPostingId);
 
             if (existingFeedback != null)
             {
@@ -138,10 +138,10 @@ namespace PlacementManagementSystem.Controllers
             }
 
             // Get company ID
-            var companyId = await _context.Companies
+            var companyId = _context.Companies
                 .Where(c => c.UserId == application.JobPosting.CompanyUserId)
                 .Select(c => c.Id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             // Create feedback (without ApplicationId for now)
             var feedback = new Feedback
@@ -158,24 +158,25 @@ namespace PlacementManagementSystem.Controllers
             };
 
             _context.Feedbacks.Add(feedback);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             TempData["Success"] = "Thank you for your feedback!";
             return RedirectToAction("Jobs", "Student");
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetApplicationId(int jobId)
+        public IActionResult GetApplicationId(int jobId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Json(new { error = "Unauthorized" });
             }
 
-            var application = await _context.Applications
+            var application = _context.Applications
                 .Where(a => a.JobPostingId == jobId && a.StudentUserId == user.Id && a.Status != ApplicationStatus.Pending)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (application == null)
             {

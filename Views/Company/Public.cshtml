@@ -1,0 +1,46 @@
+@model PlacementManagementSystem.Models.Company
+@{
+    ViewData["Title"] = "Company Profile";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">@Model.CompanyName</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>Industry</strong>
+                            <div class="text-muted">@(string.IsNullOrWhiteSpace(Model.Industry) ? "-" : Model.Industry)</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Website</strong>
+                            <div>
+                                @if (!string.IsNullOrWhiteSpace(Model.Website))
+                                {
+                                    <a href="@Model.Website" target="_blank" rel="noopener">@Model.Website</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Address</strong>
+                            <div class="text-muted">@(string.IsNullOrWhiteSpace(Model.Address) ? "-" : Model.Address)</div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <strong>Description</strong>
+                        <p class="mb-0" style="white-space: pre-line;">@(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

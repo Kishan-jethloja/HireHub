@@ -11,7 +11,7 @@
             @{ var currentUser = UserManager.GetUserAsync(User).Result; }
             @if (currentUser != null && currentUser.UserType == UserType.Student)
             {
-                <a class="btn btn-link btn-sm" asp-controller="Student" asp-action="Details">Profile</a>
+                <a class="btn btn-link btn-sm" asp-controller="Student" asp-action="Profile">Profile</a>
             }
             else if (currentUser != null && currentUser.UserType == UserType.Company)
             {

@@ -1,6 +1,6 @@
 using System;
 
-namespace PlacementManagementSystem.Models
+namespace PlacementManagementSystem.ViewModels
 {
     public class ChatMessageViewModel
     {
@@ -12,3 +12,5 @@ namespace PlacementManagementSystem.Models
         public bool IsOwnMessage { get; set; }
     }
 }
+
+

@@ -16,7 +16,6 @@ namespace PlacementManagementSystem.Models
 		public int Id { get; set; }
 		
 		public string CompanyUserId { get; set; }
-		public ApplicationUser CompanyUser { get; set; }
 
 		[Required]
 		public JobType Type { get; set; }
@@ -29,13 +28,10 @@ namespace PlacementManagementSystem.Models
 		[StringLength(200)]
 		public string Title { get; set; }
 
-		[StringLength(2000)]
+		[StringLength(5000)]
 		public string Description { get; set; }
 
-		[StringLength(1000)]
-		[Url]
-		[Display(Name = "Google Form URL")]
-		public string GoogleFormUrl { get; set; }
+		// Removed external form usage
 
 		[StringLength(200)]
 		public string Location { get; set; }
@@ -47,6 +43,16 @@ namespace PlacementManagementSystem.Models
 		[Range(0, 10)]
 		[Display(Name = "Minimum CPI Required")]
 		public decimal? MinimumCPI { get; set; }
+
+		// Duration fields
+		// For Internship, use months; for FullTime, use years
+		[Range(1, int.MaxValue)]
+		[Display(Name = "Duration (Months)")]
+		public int? DurationMonths { get; set; }
+
+		[Range(1, int.MaxValue)]
+		[Display(Name = "Duration (Years)")]
+		public int? DurationYears { get; set; }
 
 		[Display(Name = "Application Deadline")]
 		public DateTime? ApplyByUtc { get; set; }

@@ -44,7 +44,7 @@ namespace PlacementManagementSystem.Data
 				.IsUnique();
 
             builder.Entity<Company>()
-                .HasOne(c => c.User)
+                .HasOne<ApplicationUser>()
                 .WithOne()
                 .HasForeignKey<Company>(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -75,7 +75,7 @@ namespace PlacementManagementSystem.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.Entity<JobPosting>()
-                .HasOne(j => j.CompanyUser)
+                .HasOne<ApplicationUser>()
                 .WithMany()
                 .HasForeignKey(j => j.CompanyUserId)
                 .OnDelete(DeleteBehavior.Restrict);

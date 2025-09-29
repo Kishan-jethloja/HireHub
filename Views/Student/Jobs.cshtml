@@ -6,8 +6,7 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-	<h2 class="mb-0">Jobs for Your College</h2>
-	<a class="btn btn-outline-primary" asp-controller="Student" asp-action="Profile">Edit Profile</a>
+    <h2 class="mb-0">Jobs for Your College</h2>
 </div>
 
 @if (TempData["Error"] != null)
@@ -87,28 +86,47 @@ else
 								}
 							</div>
 						</div>
-						<p class="text-muted mb-2">
-							<i class="fas fa-map-marker-alt mr-1"></i>@(string.IsNullOrWhiteSpace(job.Location) ? "Remote/NA" : job.Location)
-							@if (job.MinimumCPI.HasValue)
-							{
-								<span class="badge badge-info ml-2">Min CPI: @job.MinimumCPI</span>
-							}
-						</p>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-map-marker-alt mr-1"></i>@(string.IsNullOrWhiteSpace(job.Location) ? "Remote/NA" : job.Location)
+                            @if (job.MinimumCPI.HasValue)
+                            {
+                                <span class="badge badge-info ml-2">Min CPI: @job.MinimumCPI</span>
+                            }
+                            @{
+                                var durationText = job.Type == JobType.Internship && job.DurationMonths.HasValue
+                                    ? $"{job.DurationMonths} mo"
+                                    : (job.Type == JobType.FullTime && job.DurationYears.HasValue ? $"{job.DurationYears} yr" : null);
+                            }
+                            @if (!string.IsNullOrEmpty(durationText))
+                            {
+                                <span class="badge badge-secondary ml-2">Duration: @durationText</span>
+                            }
+                        </p>
 						@if (!string.IsNullOrWhiteSpace(job.Description))
 						{
 							<p class="card-text text-truncate" title="@job.Description">@job.Description</p>
 						}
 						<div class="mt-auto d-flex justify-content-between align-items-center">
-							<small class="text-muted">Apply by: @(job.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</small>
-							@{ var applied = ((System.Collections.Generic.HashSet<int>)ViewBag.AppliedJobIds)?.Contains(job.Id) ?? false; }
-							@if (applied)
-							{
-								<a class="btn btn-secondary btn-sm" asp-action="Apply" asp-route-id="@job.Id">Edit</a>
-							}
-							else
-							{
-								<a class="btn btn-primary btn-sm" asp-action="Apply" asp-route-id="@job.Id">Apply</a>
-							}
+                            <small class="text-muted">Apply by: @(job.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</small>
+                            @{ 
+                                var applied = ((System.Collections.Generic.HashSet<int>)ViewBag.AppliedJobIds)?.Contains(job.Id) ?? false; 
+                                var deadlinePassed = job.ApplyByUtc.HasValue && job.ApplyByUtc.Value < DateTime.UtcNow; 
+                            }
+                            @if (deadlinePassed)
+                            {
+                                <span class="badge badge-secondary">Deadline Passed</span>
+                                <a class="btn btn-outline-primary btn-sm ml-2" asp-action="JobDetails" asp-route-id="@job.Id">View Details</a>
+                            }
+                            else if (applied)
+                            {
+                                <a class="btn btn-secondary btn-sm" asp-action="Apply" asp-route-id="@job.Id">Edit</a>
+                                <a class="btn btn-outline-primary btn-sm ml-2" asp-action="JobDetails" asp-route-id="@job.Id">View Details</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-primary btn-sm" asp-action="Apply" asp-route-id="@job.Id">Apply</a>
+                                <a class="btn btn-outline-primary btn-sm ml-2" asp-action="JobDetails" asp-route-id="@job.Id">View Details</a>
+                            }
 						</div>
 					</div>
 				</div>

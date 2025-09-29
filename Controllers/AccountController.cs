@@ -32,20 +32,20 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+		public IActionResult Login(LoginViewModel model, string returnUrl = null)
 		{
 			ViewData["ReturnUrl"] = returnUrl;
 
 			if (ModelState.IsValid)
 			{
-				var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+				var result = _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false).Result;
 				if (result.Succeeded)
 				{
-					var user = await _userManager.FindByEmailAsync(model.Email);
-					if (user != null && user.UserType == UserType.Company)
-					{
-						return RedirectToAction("Index", "Home");
-					}
+					var user = _userManager.FindByEmailAsync(model.Email).Result;
+                    if (user != null && user.UserType == UserType.Company)
+                    {
+                        return RedirectToAction("MyJobs", "Company");
+                    }
 					if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
 					{
 						return Redirect(returnUrl);
@@ -73,7 +73,7 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Register(RegisterViewModel model)
+		public IActionResult Register(RegisterViewModel model)
 		{
 			// Debug: Log model values
 			System.Diagnostics.Debug.WriteLine($"UserType: {model.UserType}");
@@ -101,7 +101,7 @@ namespace PlacementManagementSystem.Controllers
 				UserType = model.UserType
 			};
 
-			var result = await _userManager.CreateAsync(user, model.Password);
+			var result = _userManager.CreateAsync(user, model.Password).Result;
 
 			if (result.Succeeded)
 			{
@@ -121,7 +121,7 @@ namespace PlacementManagementSystem.Controllers
 							State = model.State,
 							CollegeUserId = user.Id
 						});
-							await _db.SaveChangesAsync();
+							_db.SaveChanges();
 						}
 					}
 					else if (model.UserType == UserType.Company)
@@ -151,14 +151,14 @@ namespace PlacementManagementSystem.Controllers
 							IsApproved = false
 						};
 						_db.Students.Add(student);
-						await _db.SaveChangesAsync();
+						_db.SaveChanges();
 					}
 				}
 				catch (Exception ex)
 				{
 					ModelState.AddModelError(string.Empty, $"Failed to save profile: {ex.Message}");
 					// Undo user creation if profile save fails
-					await _userManager.DeleteAsync(user);
+					_userManager.DeleteAsync(user).Wait();
 					return View(model);
 				}
 
@@ -176,9 +176,9 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Logout()
+		public IActionResult Logout()
 		{
-			await _signInManager.SignOutAsync();
+			_signInManager.SignOutAsync().Wait();
 			return RedirectToAction("Index", "Home");
 		}
 

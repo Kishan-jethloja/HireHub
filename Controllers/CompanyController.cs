@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlacementManagementSystem.Data;
 using PlacementManagementSystem.Models;
+using PlacementManagementSystem.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Linq;
@@ -23,9 +24,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Profile()
+		public IActionResult Profile()
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -36,9 +38,10 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Profile(Company model)
+		public IActionResult Profile(Company model)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -74,9 +77,32 @@ namespace PlacementManagementSystem.Controllers
 				company.Industry = model.Industry;
 				company.Address = model.Address;
 			}
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 			TempData["Success"] = "Profile updated.";
 			return RedirectToAction("Profile");
+		}
+
+		[HttpGet]
+		public IActionResult Public(string id)
+		{
+			if (string.IsNullOrWhiteSpace(id))
+			{
+				return NotFound();
+			}
+
+			var company = _db.Companies.FirstOrDefault(c => c.UserId == id);
+			if (company == null)
+			{
+				return NotFound();
+			}
+
+			var jobs = _db.JobPostings
+				.Where(j => j.CompanyUserId == id)
+				.OrderByDescending(j => j.CreatedAtUtc)
+				.ToList();
+
+			ViewBag.Jobs = jobs;
+			return View(company);
 		}
 
 		[HttpGet]
@@ -89,9 +115,10 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> CreateJob(JobPosting model)
+		public IActionResult CreateJob(JobPosting model)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -103,6 +130,26 @@ namespace PlacementManagementSystem.Controllers
 				ModelState.AddModelError("ApplyByUtc", "Application deadline cannot be in the past.");
 			}
 
+			// Duration validation: Internship => months required; FullTime => years required
+			if (model.Type == JobType.Internship)
+			{
+				if (!model.DurationMonths.HasValue || model.DurationMonths.Value <= 0)
+				{
+					ModelState.AddModelError("DurationMonths", "Please enter duration in months for an internship.");
+				}
+				// Ensure the other unit is cleared
+				model.DurationYears = null;
+			}
+			else if (model.Type == JobType.FullTime)
+			{
+				if (!model.DurationYears.HasValue || model.DurationYears.Value <= 0)
+				{
+					ModelState.AddModelError("DurationYears", "Please enter duration in years for a full-time role.");
+				}
+				// Ensure the other unit is cleared
+				model.DurationMonths = null;
+			}
+
 			if (!ModelState.IsValid)
 			{
 				// Re-populate colleges dropdown on validation error
@@ -112,15 +159,16 @@ namespace PlacementManagementSystem.Controllers
 
 			model.CompanyUserId = user.Id;
 			_db.JobPostings.Add(model);
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 			TempData["Success"] = "Job/Internship posted successfully.";
 			return RedirectToAction("MyJobs");
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> MyJobs()
+		public IActionResult MyJobs()
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -132,9 +180,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Applications(int id)
+		public IActionResult Applications(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -156,9 +205,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Announcements(int id)
+		public IActionResult Announcements(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -179,9 +229,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> CreateAnnouncement(int id)
+		public IActionResult CreateAnnouncement(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -204,9 +255,10 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> CreateAnnouncement(int id, Announcement model)
+		public IActionResult CreateAnnouncement(int id, Announcement model)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -256,7 +308,7 @@ namespace PlacementManagementSystem.Controllers
 			_db.Announcements.Add(ann);
 			try
 			{
-				await _db.SaveChangesAsync();
+				_db.SaveChanges();
 				TempData["Success"] = $"Announcement posted to {recipientCount} applicant(s).";
 				return RedirectToAction("Announcements", new { id = job.Id });
 			}
@@ -270,9 +322,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> ApplicationDetails(int id)
+		public IActionResult ApplicationDetails(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -295,9 +348,10 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Hire(int id)
+		public IActionResult Hire(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -315,16 +369,17 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			app.Status = ApplicationStatus.Hired;
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 			TempData["Success"] = "Applicant marked as Hired.";
 			return RedirectToAction("ApplicationDetails", new { id });
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Reject(int id)
+		public IActionResult Reject(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -342,16 +397,17 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			app.Status = ApplicationStatus.Rejected;
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 			TempData["Success"] = "Applicant rejected.";
 			return RedirectToAction("ApplicationDetails", new { id });
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> DeleteJob(int id)
+		public IActionResult DeleteJob(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Company)
 			{
 				return Forbid();
@@ -369,22 +425,23 @@ namespace PlacementManagementSystem.Controllers
 
 			// Delete the job posting
 			_db.JobPostings.Remove(job);
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 
 			TempData["Success"] = "Job posting deleted successfully.";
 			return RedirectToAction("MyJobs");
 		}
 
-		public async Task<IActionResult> Feedback(int? jobId = null)
+		public IActionResult Feedback(int? jobId = null)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user?.UserType != UserType.Company)
 			{
 				return Forbid();
 			}
 
 			// Get company's feedback
-			var company = await _db.Companies.FirstOrDefaultAsync(c => c.UserId == user.Id);
+			var company = _db.Companies.FirstOrDefault(c => c.UserId == user.Id);
 			if (company == null)
 			{
 				return NotFound();
@@ -394,7 +451,7 @@ namespace PlacementManagementSystem.Controllers
 			string jobTitle = null;
 			if (jobId.HasValue)
 			{
-				var job = await _db.JobPostings.FirstOrDefaultAsync(j => j.Id == jobId.Value && j.CompanyUserId == user.Id);
+				var job = _db.JobPostings.FirstOrDefault(j => j.Id == jobId.Value && j.CompanyUserId == user.Id);
 				if (job == null)
 				{
 					return NotFound();
@@ -412,7 +469,7 @@ namespace PlacementManagementSystem.Controllers
 				feedbackQuery = feedbackQuery.Where(f => f.JobPostingId == jobId.Value);
 			}
 
-			var feedback = await feedbackQuery
+			var feedback = feedbackQuery
 				.Include(f => f.AuthorUser)
 				.Include(f => f.JobPosting)
 				.OrderByDescending(f => f.CreatedAtUtc)
@@ -429,11 +486,32 @@ namespace PlacementManagementSystem.Controllers
 					JobTitle = f.JobPosting != null ? f.JobPosting.Title : (jobTitle ?? "General Feedback"),
 					ApplicationStatus = "N/A" // Temporarily disabled
 				})
-				.ToListAsync();
+				.ToList();
 
 			ViewBag.JobTitle = jobTitle;
 			ViewBag.IsFilteredByJob = jobId.HasValue;
 			return View(feedback);
+		}
+
+		[HttpGet]
+		public IActionResult JobDetails(int id)
+		{
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+			if (user == null || user.UserType != UserType.Company)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id && j.CompanyUserId == user.Id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			var company = _db.Companies.FirstOrDefault(c => c.UserId == user.Id);
+			ViewBag.CompanyName = company?.CompanyName ?? "My Company";
+			return View(job);
 		}
 
 	}

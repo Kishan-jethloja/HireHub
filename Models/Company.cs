@@ -8,7 +8,6 @@ namespace PlacementManagementSystem.Models
         
         [Required]
         public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
 
         [Required]
         [StringLength(200)]

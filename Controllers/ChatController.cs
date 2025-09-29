@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlacementManagementSystem.Data;
 using PlacementManagementSystem.Models;
+using PlacementManagementSystem.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,23 +25,24 @@ namespace PlacementManagementSystem.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(bool refresh = false)
+        public IActionResult Index(bool refresh = false)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Forbid();
             }
 
             // Get student's college
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == user.Id);
+            var student = _context.Students.FirstOrDefault(s => s.UserId == user.Id);
             if (student == null)
             {
                 return Forbid();
             }
 
             // Refresh student data to get latest college information
-            await _context.Entry(student).ReloadAsync();
+            _context.Entry(student).Reload();
 
             // Check if student is approved by college
             if (!student.IsApproved)
@@ -68,21 +70,17 @@ namespace PlacementManagementSystem.Controllers
             
             try
             {
-            // Debug: Log the college name being used for filtering
-            System.Diagnostics.Debug.WriteLine($"Filtering chat messages for college: {collegeName}");
-            System.Diagnostics.Debug.WriteLine($"Student ID: {student.Id}, User ID: {user.Id}");
+            // Filter by college
             
             // Get messages from students in the same college (case-insensitive comparison)
-            var collegeStudentIds = await _context.Students
+            var collegeStudentIds = _context.Students
                 .Where(s => s.CollegeName != null && s.CollegeName.Trim().ToLower() == collegeName.Trim().ToLower())
                 .Select(s => s.UserId)
-                .ToListAsync();
+                .ToList();
             
-            // Debug: Log how many students are in this college
-            System.Diagnostics.Debug.WriteLine($"Found {collegeStudentIds.Count} students in college: {collegeName}");
-            System.Diagnostics.Debug.WriteLine($"College student IDs: {string.Join(", ", collegeStudentIds)}");
+            // Build message list
 
-                messages = await _context.ChatMessages
+                messages = _context.ChatMessages
                     .Where(m => !m.IsDeleted && collegeStudentIds.Contains(m.SenderUserId))
                     .Include(m => m.SenderUser)
                     .OrderByDescending(m => m.SentAtUtc)
@@ -99,16 +97,9 @@ namespace PlacementManagementSystem.Controllers
                         IsOwnMessage = m.SenderUserId == user.Id
                     })
                     .OrderBy(m => m.SentAt)
-                    .ToListAsync();
+                    .ToList();
                 
-                // Debug: Log how many messages were retrieved
-                System.Diagnostics.Debug.WriteLine($"Retrieved {messages.Count} messages for college: {collegeName}");
-                
-                // Debug: Log details of each message
-                foreach (var msg in messages)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Message from {msg.SenderName} (ID: {msg.SenderUserId}): {msg.Message}");
-                }
+                // Messages ready
             }
             catch (Exception)
             {
@@ -121,35 +112,36 @@ namespace PlacementManagementSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> DebugChatState()
+        public IActionResult DebugChatState()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Forbid();
             }
 
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == user.Id);
+            var student = _context.Students.FirstOrDefault(s => s.UserId == user.Id);
             if (student == null)
             {
                 return Json(new { error = "Student not found" });
             }
 
             // Refresh student data
-            await _context.Entry(student).ReloadAsync();
+            _context.Entry(student).Reload();
 
             // Get all students in the same college
-            var collegeStudents = await _context.Students
+            var collegeStudents = _context.Students
                 .Where(s => s.CollegeName == student.CollegeName)
                 .Select(s => new { s.Id, s.UserId, s.CollegeName, s.IsApproved })
-                .ToListAsync();
+                .ToList();
 
             // Get all messages from this student
-            var allMessages = await _context.ChatMessages
+            var allMessages = _context.ChatMessages
                 .Where(m => m.SenderUserId == user.Id)
                 .Select(m => new { m.Id, m.Message, m.SentAtUtc, m.IsDeleted })
                 .OrderByDescending(m => m.SentAtUtc)
-                .ToListAsync();
+                .ToList();
 
             return Json(new
             {
@@ -161,36 +153,38 @@ namespace PlacementManagementSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ClearOldMessages()
+        public IActionResult ClearOldMessages()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Forbid();
             }
 
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == user.Id);
+            var student = _context.Students.FirstOrDefault(s => s.UserId == user.Id);
             if (student == null)
             {
                 return Json(new { error = "Student not found" });
             }
 
             // Get all messages from this student
-            var oldMessages = await _context.ChatMessages
+            var oldMessages = _context.ChatMessages
                 .Where(m => m.SenderUserId == user.Id)
-                .ToListAsync();
+                .ToList();
 
             // Remove all old messages
             _context.ChatMessages.RemoveRange(oldMessages);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return Json(new { success = true, message = $"Cleared {oldMessages.Count} old messages" });
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessage(string message)
+        public IActionResult SendMessage(string message)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Json(new { success = false, error = "Only students can send messages" });
@@ -209,28 +203,29 @@ namespace PlacementManagementSystem.Controllers
             };
 
             _context.ChatMessages.Add(chatMessage);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return Json(new { success = true });
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteMessage(int messageId)
+        public IActionResult DeleteMessage(int messageId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.UserType != UserType.Student)
             {
                 return Json(new { success = false, error = "Only students can delete messages" });
             }
 
-            var message = await _context.ChatMessages.FindAsync(messageId);
+            var message = _context.ChatMessages.FirstOrDefault(m => m.Id == messageId);
             if (message == null || message.SenderUserId != user.Id)
             {
                 return Json(new { success = false, error = "You can only delete your own messages" });
             }
 
             message.IsDeleted = true;
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return Json(new { success = true });
         }

@@ -19,10 +19,11 @@ namespace PlacementManagementSystem.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             ViewBag.ShowProfileBanner = false;
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user != null && user.UserType == UserType.Student)
             {
                 // Land students on Jobs by default
@@ -59,7 +60,7 @@ namespace PlacementManagementSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Feedback(Feedback model)
+        public IActionResult Feedback(Feedback model)
         {
             ViewBag.Companies = _db.Companies.Select(c => new { c.Id, c.CompanyName }).ToList();
 
@@ -68,7 +69,8 @@ namespace PlacementManagementSystem.Controllers
                 return View(model);
             }
 
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Please login to submit feedback.");
@@ -105,7 +107,7 @@ namespace PlacementManagementSystem.Controllers
             model.AuthorUserId = user.Id;
 
             _db.Feedbacks.Add(model);
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
             TempData["Success"] = "Feedback submitted successfully.";
             return RedirectToAction("Feedback");
         }

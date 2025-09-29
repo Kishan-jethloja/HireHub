@@ -20,6 +20,12 @@ namespace PlacementManagementSystem.Controllers
 			_userManager = userManager;
 		}
 
+		private ApplicationUser GetCurrentUser()
+		{
+			var userId = _userManager.GetUserId(User);
+			return _userManager.Users.FirstOrDefault(u => u.Id == userId);
+		}
+
 		public class CompanySummary
 		{
 			public string CompanyUserId { get; set; }
@@ -32,7 +38,7 @@ namespace PlacementManagementSystem.Controllers
 		[HttpGet]
 		public IActionResult Students(string college)
 		{
-			var user = _userManager.GetUserAsync(User).Result;
+			var user = GetCurrentUser();
 			if (user == null)
 			{
 				return Forbid();
@@ -41,9 +47,7 @@ namespace PlacementManagementSystem.Controllers
 			// Default filter to the logged-in college (if this account owns a college)
 			var ownedCollege = _db.Colleges.FirstOrDefault(c => c.CollegeUserId == user.Id)?.Name;
 			var effectiveCollege = string.IsNullOrWhiteSpace(college) ? ownedCollege : college;
-			var query = _db.Students
-				.Include(s => s.User)
-				.AsQueryable();
+            var query = _db.Students.AsQueryable();
 			if (!string.IsNullOrWhiteSpace(effectiveCollege))
 			{
 				query = query.Where(s => s.CollegeName == effectiveCollege);
@@ -69,7 +73,7 @@ namespace PlacementManagementSystem.Controllers
 		[HttpGet]
 		public IActionResult Companies()
 		{
-			var user = _userManager.GetUserAsync(User).Result;
+			var user = GetCurrentUser();
 			if (user == null || user.UserType != UserType.College)
 			{
 				return Forbid();
@@ -115,7 +119,7 @@ namespace PlacementManagementSystem.Controllers
 		[HttpGet]
 		public IActionResult CompanyJobs(string id)
 		{
-			var user = _userManager.GetUserAsync(User).Result;
+			var user = GetCurrentUser();
 			if (user == null || user.UserType != UserType.College)
 			{
 				return Forbid();
@@ -147,7 +151,7 @@ namespace PlacementManagementSystem.Controllers
 		[HttpGet]
 		public IActionResult JobDetails(int id)
 		{
-			var user = _userManager.GetUserAsync(User).Result;
+			var user = GetCurrentUser();
 			if (user == null || user.UserType != UserType.College)
 			{
 				return Forbid();
@@ -160,9 +164,8 @@ namespace PlacementManagementSystem.Controllers
 				return RedirectToAction("Profile");
 			}
 
-			var job = _db.JobPostings
-				.Include(j => j.CompanyUser)
-				.FirstOrDefault(j => j.Id == id && (j.CollegeName == ownedCollege || j.CollegeName == "All Colleges"));
+            var job = _db.JobPostings
+                .FirstOrDefault(j => j.Id == id && (j.CollegeName == ownedCollege || j.CollegeName == "All Colleges"));
 
 			if (job == null)
 			{
@@ -180,7 +183,7 @@ namespace PlacementManagementSystem.Controllers
 		[HttpGet]
 		public IActionResult Profile()
 		{
-			var user = _userManager.GetUserAsync(User).Result;
+			var user = GetCurrentUser();
 			if (user == null || user.UserType != UserType.College)
 			{
 				return Forbid();
@@ -193,7 +196,7 @@ namespace PlacementManagementSystem.Controllers
 		[ValidateAntiForgeryToken]
 		public IActionResult Profile(College model)
 		{
-			var user = _userManager.GetUserAsync(User).Result;
+			var user = GetCurrentUser();
 			if (user == null || user.UserType != UserType.College)
 			{
 				return Forbid();

@@ -1,4 +1,4 @@
-@model List<PlacementManagementSystem.Models.ChatMessageViewModel>
+@model List<PlacementManagementSystem.ViewModels.ChatMessageViewModel>
 @{
     ViewData["Title"] = "Student Chat";
 }
@@ -9,9 +9,6 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Student Chat</h2>
         <div class="d-flex align-items-center">
-            <button id="clearOldMessages" class="btn btn-sm btn-outline-warning mr-2" style="display: none;">
-                <i class="fas fa-trash"></i> Clear Old Messages
-            </button>
             <div class="text-muted">
                 <i class="fas fa-university"></i> College Students Only
             </div>
@@ -210,34 +207,6 @@
         // Clear chat history when page loads
         clearChatHistory();
 
-        // Handle clear old messages button
-        document.getElementById('clearOldMessages').addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all your old chat messages? This action cannot be undone.')) {
-                fetch('/Chat/ClearOldMessages', {
-                    method: 'POST',
-                    headers: {
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        // Clear the chat display
-                        clearChatHistory();
-                        // Hide the button
-                        this.style.display = 'none';
-                    } else {
-                        alert('Error: ' + (data.error || 'Failed to clear messages'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error clearing messages');
-                });
-            }
-        });
-
         // Start SignalR connection
         connection.start().then(function () {
             console.log("Connected to chat hub");
@@ -251,24 +220,6 @@
             addMessage(message);
         });
 
-        // Check for old messages and show clear button if needed (only if user has chat access)
-        function checkForOldMessages() {
-            if (messageForm) { // Only check if user has chat access
-                fetch('/Chat/DebugChatState')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.allMessages && data.allMessages.length > 0) {
-                            document.getElementById('clearOldMessages').style.display = 'inline-block';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error checking for old messages:', error);
-                    });
-            }
-        }
-
-        // Check for old messages on page load
-        checkForOldMessages();
 
         // Handle message deletion
         connection.on("MessageDeleted", function (messageId) {

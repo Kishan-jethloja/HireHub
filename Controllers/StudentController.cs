@@ -26,9 +26,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Announcements()
+		public IActionResult Announcements()
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -54,9 +55,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Announcement(int id)
+		public IActionResult Announcement(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -80,9 +82,10 @@ namespace PlacementManagementSystem.Controllers
 			ViewBag.CompanyName = string.IsNullOrWhiteSpace(name) ? ann.CompanyUser?.FullName : name;
 			return View(ann);
 		}
-		public async Task<IActionResult> Apply(int id)
+		public IActionResult Apply(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -91,6 +94,17 @@ namespace PlacementManagementSystem.Controllers
 			if (job == null)
 			{
 				return NotFound();
+			}
+
+			// If already hired for another job, block applying to any other job
+			var hiredJobIdsGlobal = _db.Applications
+				.Where(a => a.StudentUserId == user.Id && a.Status == ApplicationStatus.Hired)
+				.Select(a => a.JobPostingId)
+				.ToHashSet();
+			if (hiredJobIdsGlobal.Any() && !hiredJobIdsGlobal.Contains(id))
+			{
+				TempData["Error"] = "You are already hired and cannot apply to other jobs.";
+				return RedirectToAction("Jobs");
 			}
 			
 			// Get company name
@@ -135,9 +149,10 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Apply(int id, Application model, IFormFile resumeFile)
+		public IActionResult Apply(int id, Application model, IFormFile resumeFile)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -146,6 +161,17 @@ namespace PlacementManagementSystem.Controllers
 			if (job == null)
 			{
 				return NotFound();
+			}
+
+			// If already hired for another job, block applying to any other job
+			var hiredJobIdsGlobal = _db.Applications
+				.Where(a => a.StudentUserId == user.Id && a.Status == ApplicationStatus.Hired)
+				.Select(a => a.JobPostingId)
+				.ToHashSet();
+			if (hiredJobIdsGlobal.Any() && !hiredJobIdsGlobal.Contains(id))
+			{
+				TempData["Error"] = "You are already hired and cannot apply to other jobs.";
+				return RedirectToAction("Jobs");
 			}
 
 			ModelState.Remove("StudentUserId");
@@ -208,18 +234,19 @@ namespace PlacementManagementSystem.Controllers
 				var filePath = Path.Combine(uploadsDir, fileName);
 				using (var stream = new FileStream(filePath, FileMode.Create))
 				{
-					await resumeFile.CopyToAsync(stream);
+					resumeFile.CopyTo(stream);
 				}
 				application.ResumePath = $"/uploads/applications/{fileName}";
 			}
 
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 			TempData["AppSuccess"] = "Application submitted.";
 			return RedirectToAction("Jobs");
 		}
-		public async Task<IActionResult> Jobs()
+		public IActionResult Jobs()
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -233,10 +260,9 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			// Refresh student data from database to get latest approval status
-			await _db.Entry(student).ReloadAsync();
+			_db.Entry(student).Reload();
 
-			// Debug: Log student approval status
-			System.Diagnostics.Debug.WriteLine($"Student ID: {student.Id}, IsApproved: {student.IsApproved}, CollegeName: {student.CollegeName}");
+			// Approval check
 			
 			// Block job listings until college has approved the student
 			if (!student.IsApproved)
@@ -254,10 +280,21 @@ namespace PlacementManagementSystem.Controllers
 
 			var nowUtc = DateTime.UtcNow;
 			var jobs = _db.JobPostings
-				.Where(j => j.CollegeName == student.CollegeName && (j.ApplyByUtc == null || j.ApplyByUtc >= nowUtc))
+				.Where(j => j.CollegeName == student.CollegeName)
 				.Where(j => j.MinimumCPI == null || j.MinimumCPI <= student.CGPA) // Filter by CPI requirement
 				.OrderByDescending(j => j.CreatedAtUtc)
 				.ToList();
+
+			// If already hired, only show the hired job(s) and disable others
+			var hiredJobIds = _db.Applications
+				.Where(a => a.StudentUserId == user.Id && a.Status == ApplicationStatus.Hired)
+				.Select(a => a.JobPostingId)
+				.ToHashSet();
+			if (hiredJobIds.Any())
+			{
+				jobs = jobs.Where(j => hiredJobIds.Contains(j.Id)).ToList();
+				TempData["Success"] = "Congratulations! You have been hired. Other job applications are disabled.";
+			}
 
 			var appliedJobIds = _db.Applications
 				.Where(a => a.StudentUserId == user.Id)
@@ -282,9 +319,31 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Profile()
+		public IActionResult JobDetails(int id)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+			if (user == null || user.UserType != UserType.Student)
+			{
+				return Forbid();
+			}
+
+			var job = _db.JobPostings.FirstOrDefault(j => j.Id == id);
+			if (job == null)
+			{
+				return NotFound();
+			}
+
+			var companyName = _db.Companies.FirstOrDefault(c => c.UserId == job.CompanyUserId)?.CompanyName ?? "Unknown Company";
+			ViewBag.CompanyName = companyName;
+			return View(job);
+		}
+
+		[HttpGet]
+		public IActionResult Profile()
+		{
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -312,9 +371,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> CheckApprovalStatus()
+		public IActionResult CheckApprovalStatus()
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -327,7 +387,7 @@ namespace PlacementManagementSystem.Controllers
 			}
 
 			// Refresh from database
-			await _db.Entry(student).ReloadAsync();
+			_db.Entry(student).Reload();
 
 			return Json(new { 
 				studentId = student.Id, 
@@ -338,9 +398,10 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Details()
+		public IActionResult Details()
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -369,9 +430,10 @@ namespace PlacementManagementSystem.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Profile(Student model, IFormFile resumeFile)
+		public IActionResult Profile(Student model, IFormFile resumeFile)
 		{
-			var user = await _userManager.GetUserAsync(User);
+			var userId = _userManager.GetUserId(User);
+			var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
 			if (user == null || user.UserType != UserType.Student)
 			{
 				return Forbid();
@@ -461,12 +523,12 @@ namespace PlacementManagementSystem.Controllers
 				var filePath = Path.Combine(uploadsDir, fileName);
 				using (var stream = new FileStream(filePath, FileMode.Create))
 				{
-					await resumeFile.CopyToAsync(stream);
+					resumeFile.CopyTo(stream);
 				}
 				student.ResumePath = $"/uploads/resumes/{fileName}";
 			}
 
-			await _db.SaveChangesAsync();
+			_db.SaveChanges();
 			
 			if (!student.IsApproved && !string.IsNullOrEmpty(student.CollegeName) && student.CollegeName != "Unassigned")
 			{

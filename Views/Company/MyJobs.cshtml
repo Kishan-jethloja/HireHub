@@ -47,19 +47,24 @@
 									</div>
 								</div>
 							</div>
-							<ul class="list-unstyled mb-3">
+                            <ul class="list-unstyled mb-3">
 								<li><strong>College:</strong> @j.CollegeName</li>
 								<li><strong>Location:</strong> @(string.IsNullOrWhiteSpace(@j.Location) ? "Remote/NA" : @j.Location)</li>
 								<li><strong>CTC/Stipend:</strong> @(j.Compensation?.ToString() ?? "-")</li>
 								<li><strong>Min CPI:</strong> @(j.MinimumCPI?.ToString() ?? "No requirement")</li>
-								<li><strong>Apply By:</strong> @(j.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</li>
+                                <li><strong>Apply By:</strong> @(j.ApplyByUtc?.ToString("yyyy-MM-dd") ?? "-")</li>
 							</ul>
-							<div class="mt-auto d-flex justify-content-between align-items-center">
-								<small class="text-muted">Created: @j.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
-								<a class="btn btn-outline-primary btn-sm" asp-action="Applications" asp-route-id="@j.Id">
-									<i class="fas fa-eye mr-1"></i>View Applications
-								</a>
-							</div>
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Created: @j.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</small>
+                                <div>
+                                    <a class="btn btn-outline-primary btn-sm mr-2" asp-controller="Company" asp-action="JobDetails" asp-route-id="@j.Id">
+                                        <i class="fas fa-info-circle mr-1"></i>View Details
+                                    </a>
+                                    <a class="btn btn-outline-primary btn-sm" asp-action="Applications" asp-route-id="@j.Id">
+                                        <i class="fas fa-eye mr-1"></i>View Applications
+                                    </a>
+                                </div>
+                            </div>
 						</div>
 					</div>
 				</div>

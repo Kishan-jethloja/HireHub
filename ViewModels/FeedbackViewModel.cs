@@ -1,6 +1,6 @@
 using System;
 
-namespace PlacementManagementSystem.Models
+namespace PlacementManagementSystem.ViewModels
 {
     public class FeedbackViewModel
     {
@@ -14,3 +14,5 @@ namespace PlacementManagementSystem.Models
         public string ApplicationStatus { get; set; }
     }
 }
+
+

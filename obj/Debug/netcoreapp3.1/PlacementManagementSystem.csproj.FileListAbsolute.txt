@@ -176,3 +176,6 @@ E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Feedback.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\StudentFeedback\Create.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\StudentFeedback\Index.cshtml.g.cs
 E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\College\JobDetails.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Student\JobDetails.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\JobDetails.cshtml.g.cs
+E:\HireHub\obj\Debug\netcoreapp3.1\Razor\Views\Company\Public.cshtml.g.cs
