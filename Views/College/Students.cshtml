@@ -70,7 +70,7 @@ else
 				{
 					<tr>
 						<td>@s.StudentId</td>
-						<td>@s.User?.FullName</td>
+					<td>@(ViewBag.UserNames != null && ((IDictionary<string, string>)ViewBag.UserNames).ContainsKey(s.UserId) ? ((IDictionary<string, string>)ViewBag.UserNames)[s.UserId] : "-")</td>
 						<td>@s.CollegeName</td>
 						<td>@s.Department</td>
 						<td>@s.Year</td>

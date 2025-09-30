@@ -100,6 +100,7 @@ namespace PlacementManagementSystem.Controllers
 			{
 				ModelState.Remove("FirstName");
 				ModelState.Remove("LastName");
+				ModelState.Remove("CompanyName"); // not used for college; use CollegeName
 			}
 
 			// Manual required checks by role
@@ -108,6 +109,22 @@ namespace PlacementManagementSystem.Controllers
 				if (string.IsNullOrWhiteSpace(model.CompanyName))
 				{
 					ModelState.AddModelError("CompanyName", "Company Name is required.");
+				}
+			}
+			else if (model.UserType == UserType.College)
+			{
+				// Fallback to raw form value in case model binding failed
+				if (string.IsNullOrWhiteSpace(model.CollegeName))
+				{
+					var rawCollegeName = (Request?.Form["CollegeName"].ToString() ?? string.Empty).Trim();
+					if (!string.IsNullOrWhiteSpace(rawCollegeName))
+					{
+						model.CollegeName = rawCollegeName;
+					}
+				}
+				if (string.IsNullOrWhiteSpace(model.CollegeName))
+				{
+					ModelState.AddModelError("CollegeName", "College Name is required.");
 				}
 			}
 
@@ -147,20 +164,27 @@ namespace PlacementManagementSystem.Controllers
 				{
 					if (model.UserType == UserType.College)
 					{
-						// Ensure a College record exists for the provided name
-						var existingCollege = _db.Colleges.FirstOrDefault(c => c.Name == model.CompanyName);
-						if (existingCollege == null && !string.IsNullOrWhiteSpace(model.CompanyName))
+						// Always create a College record owned by this user
+						var owned = _db.Colleges.FirstOrDefault(c => c.CollegeUserId == user.Id);
+						if (owned == null)
 						{
-						_db.Colleges.Add(new College
-						{
-							Name = model.CompanyName,
-							WebsiteUrl = model.Website,
-							City = model.City,
-							State = model.State,
-							CollegeUserId = user.Id
-						});
-							_db.SaveChanges();
+							_db.Colleges.Add(new College
+							{
+								CollegeUserId = user.Id,
+								Name = string.IsNullOrWhiteSpace(model.CollegeName) ? "" : model.CollegeName.Trim(),
+								WebsiteUrl = string.IsNullOrWhiteSpace(model.Website) ? "" : model.Website.Trim(),
+								City = string.IsNullOrWhiteSpace(model.City) ? "" : model.City.Trim(),
+								State = string.IsNullOrWhiteSpace(model.State) ? "" : model.State.Trim()
+							});
 						}
+						else
+						{
+							owned.Name = string.IsNullOrWhiteSpace(model.CollegeName) ? owned.Name : model.CollegeName.Trim();
+							owned.WebsiteUrl = string.IsNullOrWhiteSpace(model.Website) ? owned.WebsiteUrl : model.Website.Trim();
+							owned.City = string.IsNullOrWhiteSpace(model.City) ? owned.City : model.City.Trim();
+							owned.State = string.IsNullOrWhiteSpace(model.State) ? owned.State : model.State.Trim();
+						}
+						_db.SaveChanges();
 					}
 					else if (model.UserType == UserType.Company)
 					{

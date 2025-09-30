@@ -71,31 +71,7 @@
 	<button type="submit" class="btn btn-primary">Save</button>
 </form>
 
-<div class="mt-4">
-    <h4>Recent Announcements for Your Applications</h4>
-    @{
-        var anns = (IEnumerable<PlacementManagementSystem.Models.Announcement>)ViewBag.ProfileAnnouncements ?? Enumerable.Empty<PlacementManagementSystem.Models.Announcement>();
-    }
-    @if (!anns.Any())
-    {
-        <div class="alert alert-info">No announcements yet.</div>
-    }
-    else
-    {
-        <div class="list-group">
-            @foreach (var a in anns)
-            {
-                <div class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong>@a.Title</strong>
-                        <small class="text-muted">@a.CreatedAtUtc.ToLocalTime().ToString("g")</small>
-                    </div>
-                    <div>@a.Message</div>
-                </div>
-            }
-        </div>
-    }
-</div>
+@* Announcements section removed as per requirement *@
 
 @section Scripts {
 	<partial name="_ValidationScriptsPartial" />

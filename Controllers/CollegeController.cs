@@ -67,6 +67,13 @@ namespace PlacementManagementSystem.Controllers
 				.OrderBy(s => s.Department)
 				.ThenBy(s => s.StudentId)
 				.ToList();
+
+			// Map userId -> full name for display without navigation include
+			var studentUserIds = students.Select(s => s.UserId).Where(id => !string.IsNullOrEmpty(id)).ToList();
+			var names = _db.Users
+				.Where(u => studentUserIds.Contains(u.Id))
+				.ToDictionary(u => u.Id, u => ($"{u.FirstName} {u.LastName}").Trim());
+			ViewBag.UserNames = names;
 			return View(students);
 		}
 
