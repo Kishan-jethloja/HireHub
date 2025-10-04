@@ -17,7 +17,7 @@
                         <div asp-validation-summary="All" class="text-danger"></div>
             
                         <div class="form-group">
-                            <label asp-for="UserType" class="form-label"></label>
+                            <label asp-for="UserType" class="form-label">User Type <span class="text-danger">*</span></label>
                             <select asp-for="UserType" class="form-control" id="userTypeSelect" autocomplete="organization-title">
                                 <option value="">Select your role</option>
                                 <option value="1">Student</option>
@@ -32,14 +32,14 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label asp-for="FirstName" class="form-label"></label>
+                                            <label asp-for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
                                             <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label asp-for="LastName" class="form-label"></label>
+                                            <label asp-for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
                                             <input asp-for="LastName" class="form-control" autocomplete="family-name" />
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
@@ -53,7 +53,7 @@
                             <h4>Company Information</h4>
 
                             <div class="form-group">
-                                <label class="form-label">Company Name</label>
+                                <label class="form-label">Company Name <span class="text-danger">*</span></label>
                                 <input asp-for="CompanyName" class="form-control" autocomplete="organization" />
                                 <span asp-validation-for="CompanyName" class="text-danger"></span>
                             </div>
@@ -66,7 +66,7 @@
 
                             <div class="form-group">
                                 <label class="form-label">College Name <span class="text-danger">*</span></label>
-                                <input asp-for="CollegeName" class="form-control" autocomplete="organization" required />
+                                <input asp-for="CollegeName" class="form-control" autocomplete="organization" />
                                 <span asp-validation-for="CollegeName" class="text-danger"></span>
                             </div>
 
@@ -78,20 +78,20 @@
 
                             <div class="form-group">
                                 <label class="form-label">City <span class="text-danger">*</span></label>
-                                <input asp-for="City" class="form-control" autocomplete="address-level2" required />
+                                <input asp-for="City" class="form-control" autocomplete="address-level2" />
                                 <span asp-validation-for="City" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">State <span class="text-danger">*</span></label>
-                                <input asp-for="State" class="form-control" autocomplete="address-level1" required />
+                                <input asp-for="State" class="form-control" autocomplete="address-level1" />
                                 <span asp-validation-for="State" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div id="credentialsFields" style="display: none;">
                             <div class="form-group">
-                                <label asp-for="Email" class="form-label"></label>
+                                <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input asp-for="Email" class="form-control" autocomplete="email" />
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
@@ -99,14 +99,14 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="Password" class="form-label"></label>
+                                        <label asp-for="Password" class="form-label">Password <span class="text-danger">*</span></label>
                                         <input asp-for="Password" class="form-control" autocomplete="new-password" />
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                                        <label asp-for="ConfirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                         <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
                                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                                     </div>

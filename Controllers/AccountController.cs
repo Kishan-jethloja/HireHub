@@ -75,40 +75,68 @@ namespace PlacementManagementSystem.Controllers
 		[ValidateAntiForgeryToken]
 		public IActionResult Register(RegisterViewModel model)
 		{
+			// Remove validation errors for fields not relevant to current user type BEFORE validation
+			if (model.UserType == UserType.Student)
+			{
+				ModelState.Remove("CompanyName");
+				ModelState.Remove("CollegeName");
+				ModelState.Remove("City");
+				ModelState.Remove("State");
+			}
+			else if (model.UserType == UserType.Company)
+			{
+				ModelState.Remove("FirstName");
+				ModelState.Remove("LastName");
+				ModelState.Remove("CollegeName");
+				ModelState.Remove("City");
+				ModelState.Remove("State");
+			}
+			else if (model.UserType == UserType.College)
+			{
+				ModelState.Remove("FirstName");
+				ModelState.Remove("LastName");
+				ModelState.Remove("CompanyName");
+			}
+
 			// Debug: Log model values
 			System.Diagnostics.Debug.WriteLine($"UserType: {model.UserType}");
 			System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
 			System.Diagnostics.Debug.WriteLine($"FirstName: {model.FirstName}");
 			System.Diagnostics.Debug.WriteLine($"LastName: {model.LastName}");
 			
-			// Conditional validation by user type
-			if (model.UserType == UserType.Student)
+			// Check if UserType is selected
+			if (model.UserType == 0) // Default value means not selected
 			{
-				ModelState.Remove("CompanyName");
-				ModelState.Remove("City");
-				ModelState.Remove("State");
+				ModelState.AddModelError("UserType", "Please select your user type");
 			}
-			else if (model.UserType == UserType.Company)
+
+			// Always required fields
+			if (string.IsNullOrWhiteSpace(model.Email))
 			{
-				ModelState.Remove("CompanyName"); // will be validated manually below
-				ModelState.Remove("City");
-				ModelState.Remove("State");
-				ModelState.Remove("FirstName");
-				ModelState.Remove("LastName");
+				ModelState.AddModelError("Email", "Please enter your email address");
 			}
-			else if (model.UserType == UserType.College)
+			if (string.IsNullOrWhiteSpace(model.Password))
 			{
-				ModelState.Remove("FirstName");
-				ModelState.Remove("LastName");
-				ModelState.Remove("CompanyName"); // not used for college; use CollegeName
+				ModelState.AddModelError("Password", "Please enter a password");
 			}
 
 			// Manual required checks by role
-			if (model.UserType == UserType.Company)
+			if (model.UserType == UserType.Student)
+			{
+				if (string.IsNullOrWhiteSpace(model.FirstName))
+				{
+					ModelState.AddModelError("FirstName", "Please enter your first name");
+				}
+				if (string.IsNullOrWhiteSpace(model.LastName))
+				{
+					ModelState.AddModelError("LastName", "Please enter your last name");
+				}
+			}
+			else if (model.UserType == UserType.Company)
 			{
 				if (string.IsNullOrWhiteSpace(model.CompanyName))
 				{
-					ModelState.AddModelError("CompanyName", "Company Name is required.");
+					ModelState.AddModelError("CompanyName", "Please enter your company name");
 				}
 			}
 			else if (model.UserType == UserType.College)
@@ -124,7 +152,15 @@ namespace PlacementManagementSystem.Controllers
 				}
 				if (string.IsNullOrWhiteSpace(model.CollegeName))
 				{
-					ModelState.AddModelError("CollegeName", "College Name is required.");
+					ModelState.AddModelError("CollegeName", "Please enter your college name");
+				}
+				if (string.IsNullOrWhiteSpace(model.City))
+				{
+					ModelState.AddModelError("City", "Please enter your city");
+				}
+				if (string.IsNullOrWhiteSpace(model.State))
+				{
+					ModelState.AddModelError("State", "Please enter your state");
 				}
 			}
 

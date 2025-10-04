@@ -342,7 +342,12 @@ namespace PlacementManagementSystem.Controllers
 				return Forbid();
 			}
 
+			// Check if anyone has already been hired for this job
+			var hasHiredApplicant = _db.Applications
+				.Any(a => a.JobPostingId == job.Id && a.Status == ApplicationStatus.Hired);
+
 			ViewBag.Job = job;
+			ViewBag.HasHiredApplicant = hasHiredApplicant;
 			return View(app);
 		}
 
@@ -394,6 +399,16 @@ namespace PlacementManagementSystem.Controllers
 			if (job == null || job.CompanyUserId != user.Id)
 			{
 				return Forbid();
+			}
+
+			// Check if anyone has already been hired for this job
+			var hasHiredApplicant = _db.Applications
+				.Any(a => a.JobPostingId == job.Id && a.Status == ApplicationStatus.Hired);
+			
+			if (hasHiredApplicant)
+			{
+				TempData["Error"] = "Cannot reject applicants after someone has already been hired for this job.";
+				return RedirectToAction("ApplicationDetails", new { id });
 			}
 
 			app.Status = ApplicationStatus.Rejected;
@@ -488,8 +503,14 @@ namespace PlacementManagementSystem.Controllers
 				})
 				.ToList();
 
+			// Calculate average rating
+			var averageRating = feedback.Any() ? Math.Round(feedback.Average(f => f.Rating), 1) : 0.0;
+			var totalFeedbackCount = feedback.Count;
+
 			ViewBag.JobTitle = jobTitle;
 			ViewBag.IsFilteredByJob = jobId.HasValue;
+			ViewBag.AverageRating = averageRating;
+			ViewBag.TotalFeedbackCount = totalFeedbackCount;
 			return View(feedback);
 		}
 

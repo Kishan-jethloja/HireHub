@@ -6,23 +6,19 @@ namespace PlacementManagementSystem.ViewModels
 {
     public class RegisterViewModel
     {
-        [Required]
         [StringLength(100)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
         [StringLength(100)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "Password must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -32,7 +28,6 @@ namespace PlacementManagementSystem.ViewModels
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
-        [Required]
         [Display(Name = "User Type")]
         public UserType UserType { get; set; }
 
@@ -41,7 +36,7 @@ namespace PlacementManagementSystem.ViewModels
         [Display(Name = "Student ID")]
         public string StudentId { get; set; }
 
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "College name cannot exceed 100 characters")]
         [Display(Name = "College Name")]
         public string CollegeName { get; set; }
 
@@ -61,7 +56,7 @@ namespace PlacementManagementSystem.ViewModels
         public IFormFile ResumeFile { get; set; }
 
         // Company specific fields
-        [StringLength(200)]
+        [StringLength(200, ErrorMessage = "Company name cannot exceed 200 characters")]
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; }
 
@@ -78,11 +73,11 @@ namespace PlacementManagementSystem.ViewModels
         public string Industry { get; set; }
 
         // College specific fields
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "City name cannot exceed 100 characters")]
         [Display(Name = "City")]
         public string City { get; set; }
 
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "State name cannot exceed 100 characters")]
         [Display(Name = "State")]
         public string State { get; set; }
     }

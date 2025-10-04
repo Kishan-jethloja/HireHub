@@ -285,6 +285,13 @@ namespace PlacementManagementSystem.Controllers
 				.OrderByDescending(j => j.CreatedAtUtc)
 				.ToList();
 
+			// Get company names for each job
+			var companyUserIds = jobs.Select(j => j.CompanyUserId).Distinct().ToList();
+			var companyNames = _db.Companies
+				.Where(c => companyUserIds.Contains(c.UserId))
+				.ToDictionary(c => c.UserId, c => c.CompanyName);
+			ViewBag.CompanyNames = companyNames;
+
 			// If already hired, only show the hired job(s) and disable others
 			var hiredJobIds = _db.Applications
 				.Where(a => a.StudentUserId == user.Id && a.Status == ApplicationStatus.Hired)

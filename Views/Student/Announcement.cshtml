@@ -14,7 +14,5 @@
 </p>
 
 <div class="card shadow-sm">
-	<div class="card-body">
-		@Model.Message
-	</div>
+	<div class="card-body" style="word-wrap: break-word; overflow-wrap: break-word;">@Html.Raw(Model.Message?.TrimStart('\r', '\n', ' ', '\t').Replace("\n", "<br/>"))</div>
 </div>

@@ -48,7 +48,7 @@
 			<form asp-action="Reject" method="post">
 				@Html.AntiForgeryToken()
 				<input type="hidden" name="id" value="@Model.Id" />
-				<button type="submit" class="btn btn-danger btn-sm" @(Model.Status == PlacementManagementSystem.Models.ApplicationStatus.Rejected ? "disabled" : null)>Reject</button>
+				<button type="submit" class="btn btn-danger btn-sm" @(Model.Status == PlacementManagementSystem.Models.ApplicationStatus.Rejected || ViewBag.HasHiredApplicant == true ? "disabled" : null)>Reject</button>
 			</form>
 		</div>
 	</div>
