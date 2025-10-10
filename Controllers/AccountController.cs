@@ -46,6 +46,10 @@ namespace PlacementManagementSystem.Controllers
                     {
                         return RedirectToAction("MyJobs", "Company");
                     }
+                    if (user != null && user.UserType == UserType.College)
+                    {
+                        return RedirectToAction("Students", "College");
+                    }
 					if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
 					{
 						return Redirect(returnUrl);

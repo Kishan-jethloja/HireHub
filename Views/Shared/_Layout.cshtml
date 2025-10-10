@@ -16,16 +16,23 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm">
             <div class="container">
-                <a class="navbar-brand font-weight-bold" asp-area="" asp-controller="Home" asp-action="Index">HireHub</a>
+                @{
+                    var currentUser = SignInManager.IsSignedIn(User) ? UserManager.GetUserAsync(User).Result : null;
+                }
+                @if (currentUser != null && currentUser.UserType == UserType.College)
+                {
+                    <a class="navbar-brand font-weight-bold" asp-controller="College" asp-action="Students">HireHub</a>
+                }
+                else
+                {
+                    <a class="navbar-brand font-weight-bold" asp-area="" asp-controller="Home" asp-action="Index">HireHub</a>
+                }
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar" aria-controls="mainNavbar"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav mr-auto">
-                        @{
-                            var currentUser = SignInManager.IsSignedIn(User) ? UserManager.GetUserAsync(User).Result : null;
-                        }
                         @if (currentUser == null)
                         {
                         }
