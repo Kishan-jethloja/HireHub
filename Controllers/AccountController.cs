@@ -222,10 +222,32 @@ namespace PlacementManagementSystem.Controllers
 						}
 						_db.SaveChanges();
 					}
-					else if (model.UserType == UserType.Company)
-					{
-						// Placeholder for company profile creation in future
-					}
+                    else if (model.UserType == UserType.Company)
+                    {
+                        // Create a minimal Company profile so the name appears immediately
+                        var existingCompany = _db.Companies.FirstOrDefault(c => c.UserId == user.Id);
+                        if (existingCompany == null)
+                        {
+                            _db.Companies.Add(new Company
+                            {
+                                UserId = user.Id,
+                                CompanyName = string.IsNullOrWhiteSpace(model.CompanyName) ? "" : model.CompanyName.Trim(),
+                                Website = string.IsNullOrWhiteSpace(model.Website) ? "" : model.Website.Trim(),
+                                Industry = "",
+                                Address = "",
+                                Description = ""
+                            });
+                        }
+                        else
+                        {
+                            existingCompany.CompanyName = string.IsNullOrWhiteSpace(model.CompanyName) ? existingCompany.CompanyName : model.CompanyName.Trim();
+                            if (!string.IsNullOrWhiteSpace(model.Website))
+                            {
+                                existingCompany.Website = model.Website.Trim();
+                            }
+                        }
+                        _db.SaveChanges();
+                    }
 					else if (model.UserType == UserType.Student)
 					{
 						// Create a Student record immediately with an auto-generated StudentId

@@ -124,18 +124,31 @@ namespace PlacementManagementSystem.Controllers
 				return Forbid();
 			}
 
-			// Validate application deadline is not in the past
+            // Required field validations to complement data annotations
+            if (string.IsNullOrWhiteSpace(model.Location))
+            {
+                ModelState.AddModelError("Location", "Please enter a location.");
+            }
+
+            if (!model.ApplyByUtc.HasValue)
+            {
+                ModelState.AddModelError("ApplyByUtc", "Please select an application deadline.");
+            }
+
+            // Validate application deadline is not in the past
 			if (model.ApplyByUtc.HasValue && model.ApplyByUtc.Value.Date < DateTime.Today)
 			{
 				ModelState.AddModelError("ApplyByUtc", "Application deadline cannot be in the past.");
 			}
 
 			// Duration validation: Internship => months required; FullTime => years required
-			if (model.Type == JobType.Internship)
+            if (model.Type == JobType.Internship)
 			{
 				if (!model.DurationMonths.HasValue || model.DurationMonths.Value <= 0)
 				{
-					ModelState.AddModelError("DurationMonths", "Please enter duration in months for an internship.");
+                    ModelState.AddModelError("DurationMonths", "Please enter duration in months for an internship.");
+                    // Also add a model-level error so it appears in the validation summary reliably
+                    ModelState.AddModelError(string.Empty, "Please enter duration in months for an internship.");
 				}
 				// Ensure the other unit is cleared
 				model.DurationYears = null;
@@ -144,7 +157,9 @@ namespace PlacementManagementSystem.Controllers
 			{
 				if (!model.DurationYears.HasValue || model.DurationYears.Value <= 0)
 				{
-					ModelState.AddModelError("DurationYears", "Please enter duration in years for a full-time role.");
+                    ModelState.AddModelError("DurationYears", "Please enter duration in years for a full-time role.");
+                    // Also add a model-level error so it appears in the validation summary reliably
+                    ModelState.AddModelError(string.Empty, "Please enter duration in years for a full-time role.");
 				}
 				// Ensure the other unit is cleared
 				model.DurationMonths = null;

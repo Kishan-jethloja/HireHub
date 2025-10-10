@@ -278,9 +278,13 @@ namespace PlacementManagementSystem.Controllers
 				return RedirectToAction("Details");
 			}
 
-			var nowUtc = DateTime.UtcNow;
-			var jobs = _db.JobPostings
-				.Where(j => j.CollegeName == student.CollegeName)
+            var nowUtc = DateTime.UtcNow;
+            // Heal legacy data: ensure JobPosting.Type is not NULL to avoid materialization errors
+            // No raw SQL; handle NULL types gracefully in LINQ
+            var jobs = _db.JobPostings
+                .Where(j => j.Type != null)
+                .Where(j => j.CompanyUserId != null)
+                .Where(j => j.CollegeName == student.CollegeName)
 				.Where(j => j.MinimumCPI == null || j.MinimumCPI <= student.CGPA) // Filter by CPI requirement
 				.OrderByDescending(j => j.CreatedAtUtc)
 				.ToList();
@@ -320,7 +324,13 @@ namespace PlacementManagementSystem.Controllers
 				.Where(f => f.AuthorUserId == user.Id && f.JobPostingId != null)
 				.Select(f => f.JobPostingId.Value)
 				.ToHashSet();
-			ViewBag.FeedbackGivenJobs = feedbackGivenJobs;
+            ViewBag.FeedbackGivenJobs = feedbackGivenJobs;
+
+            // Clear any stale error banner set during previous unapproved/invalid state
+            if (TempData.ContainsKey("Error"))
+            {
+                TempData.Remove("Error");
+            }
 
 			return View(jobs);
 		}

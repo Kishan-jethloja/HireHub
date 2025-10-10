@@ -29,7 +29,7 @@
 							<span asp-validation-for="Type" class="text-danger"></span>
 						</div>
 
-						<div class="form-group">
+                        <div class="form-group">
 							<label asp-for="CollegeName">Target College</label>
 							<select asp-for="CollegeName" class="form-control">
 								<option value="">Select College</option>
@@ -44,22 +44,22 @@
 							<span asp-validation-for="CollegeName" class="text-danger"></span>
 						</div>
 
-						<div class="form-group">
+                        <div class="form-group">
 							<label asp-for="Title"></label>
 							<input asp-for="Title" class="form-control" placeholder="e.g., Software Developer, Data Analyst, Marketing Intern" />
 							<span asp-validation-for="Title" class="text-danger"></span>
 						</div>
 
-						<div class="form-group">
+                        <div class="form-group">
 							<label asp-for="Description"></label>
 							<textarea asp-for="Description" class="form-control" rows="5" placeholder="Short description, requirements, eligibility, selection process, etc."></textarea>
 							<span asp-validation-for="Description" class="text-danger"></span>
 						</div>
 
-						<div class="form-row">
+                        <div class="form-row">
 							<div class="form-group col-md-4">
 								<label asp-for="Location"></label>
-								<input asp-for="Location" class="form-control" placeholder="City/Remote" />
+                                <input asp-for="Location" class="form-control" placeholder="City/Remote" required />
 								<span asp-validation-for="Location" class="text-danger"></span>
 							</div>
 							<div class="form-group col-md-4">
@@ -90,9 +90,9 @@
                             </div>
                         </div>
 
-						<div class="form-group">
+                        <div class="form-group">
 							<label asp-for="ApplyByUtc">Application Deadline</label>
-							<input asp-for="ApplyByUtc" type="date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            <input asp-for="ApplyByUtc" type="date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
 							<small class="form-text text-muted">Deadline cannot be in the past</small>
 							<span asp-validation-for="ApplyByUtc" class="text-danger"></span>
 						</div>
