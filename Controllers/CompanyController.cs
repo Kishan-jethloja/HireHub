@@ -144,25 +144,21 @@ namespace PlacementManagementSystem.Controllers
 			// Duration validation: Internship => months required; FullTime => years required
             if (model.Type == JobType.Internship)
 			{
-				if (!model.DurationMonths.HasValue || model.DurationMonths.Value <= 0)
+				if (!model.Duration.HasValue || model.Duration.Value <= 0)
 				{
-                    ModelState.AddModelError("DurationMonths", "Please enter duration in months for an internship.");
+                    ModelState.AddModelError("Duration", "Please enter duration in months for an internship.");
                     // Also add a model-level error so it appears in the validation summary reliably
                     ModelState.AddModelError(string.Empty, "Please enter duration in months for an internship.");
 				}
-				// Ensure the other unit is cleared
-				model.DurationYears = null;
 			}
 			else if (model.Type == JobType.FullTime)
 			{
-				if (!model.DurationYears.HasValue || model.DurationYears.Value <= 0)
+				if (!model.Duration.HasValue || model.Duration.Value <= 0)
 				{
-                    ModelState.AddModelError("DurationYears", "Please enter duration in years for a full-time role.");
+                    ModelState.AddModelError("Duration", "Please enter duration in years for a full-time role.");
                     // Also add a model-level error so it appears in the validation summary reliably
                     ModelState.AddModelError(string.Empty, "Please enter duration in years for a full-time role.");
 				}
-				// Ensure the other unit is cleared
-				model.DurationMonths = null;
 			}
 
 			if (!ModelState.IsValid)

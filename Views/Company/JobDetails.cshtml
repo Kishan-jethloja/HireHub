@@ -17,9 +17,9 @@
                     <span class="badge badge-info mr-2">Min CPI: @Model.MinimumCPI</span>
                 }
                 @{
-                    var durationText = Model.Type == JobType.Internship && Model.DurationMonths.HasValue
-                        ? $"{Model.DurationMonths} mo"
-                        : (Model.Type == JobType.FullTime && Model.DurationYears.HasValue ? $"{Model.DurationYears} yr" : null);
+                    var durationText = Model.Duration.HasValue
+                        ? (Model.Type == JobType.Internship ? $"{Model.Duration} mo" : $"{Model.Duration} yr")
+                        : null;
                 }
                 @if (!string.IsNullOrEmpty(durationText))
                 {

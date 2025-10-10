@@ -75,19 +75,11 @@
 							</div>
 						</div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-6" id="durationMonthsGroup">
-                                <label asp-for="DurationMonths">Duration (Months) — Internship</label>
-                                <input asp-for="DurationMonths" class="form-control" min="1" placeholder="e.g., 6" />
-                                <small class="form-text text-muted">Fill for internships</small>
-                                <span asp-validation-for="DurationMonths" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-6" id="durationYearsGroup">
-                                <label asp-for="DurationYears">Duration (Years) — Full Time</label>
-                                <input asp-for="DurationYears" class="form-control" min="1" placeholder="e.g., 2" />
-                                <small class="form-text text-muted">Fill for full-time roles</small>
-                                <span asp-validation-for="DurationYears" class="text-danger"></span>
-                            </div>
+                        <div class="form-group">
+                            <label asp-for="Duration" id="durationLabel">Duration <span class="text-danger">*</span></label>
+                            <input asp-for="Duration" class="form-control" min="1" placeholder="Enter duration" required />
+                            <small class="form-text text-muted" id="durationHelp">Select job type to see duration unit</small>
+                            <span asp-validation-for="Duration" class="text-danger"></span>
                         </div>
 
                         <div class="form-group">
@@ -113,18 +105,26 @@
     <script>
         function toggleDurationFields() {
             var type = document.getElementById('jobType').value;
-            var months = document.getElementById('durationMonthsGroup');
-            var years = document.getElementById('durationYearsGroup');
+            var durationLabel = document.getElementById('durationLabel');
+            var durationInput = document.getElementById('Duration');
+            var durationHelp = document.getElementById('durationHelp');
+            
             if (type === '1') { // Internship
-                months.style.display = '';
-                years.style.display = 'none';
-                var yearsInput = document.getElementById('DurationYears');
-                if (yearsInput) yearsInput.value = '';
+                durationLabel.innerHTML = 'Duration (Months) — Internship <span class="text-danger">*</span>';
+                durationInput.placeholder = 'e.g., 6';
+                durationHelp.textContent = 'Enter duration in months for internships';
+                durationInput.required = true;
             } else if (type === '2') { // Full Time
-                years.style.display = '';
-                months.style.display = 'none';
-                var monthsInput = document.getElementById('DurationMonths');
-                if (monthsInput) monthsInput.value = '';
+                durationLabel.innerHTML = 'Duration (Years) — Full Time <span class="text-danger">*</span>';
+                durationInput.placeholder = 'e.g., 2';
+                durationHelp.textContent = 'Enter duration in years for full-time roles';
+                durationInput.required = true;
+            } else {
+                // No type selected
+                durationLabel.innerHTML = 'Duration <span class="text-danger">*</span>';
+                durationInput.placeholder = 'Enter duration';
+                durationHelp.textContent = 'Select job type to see duration unit';
+                durationInput.required = false;
             }
         }
         document.getElementById('jobType').addEventListener('change', toggleDurationFields);

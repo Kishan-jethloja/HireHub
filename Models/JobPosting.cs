@@ -46,17 +46,11 @@ namespace PlacementManagementSystem.Models
 		[Display(Name = "Minimum CPI Required")]
 		public decimal? MinimumCPI { get; set; }
 
-		// Duration fields
-		// For Internship, use months; for FullTime, use years
-		[Required(ErrorMessage = "Please enter duration in months for an internship.")]
-		[Range(1, int.MaxValue)]
-		[Display(Name = "Duration (Months)")]
-		public int? DurationMonths { get; set; }
-
-		[Required(ErrorMessage = "Please enter duration in years for a full-time role.")]
-		[Range(1, int.MaxValue)]
-		[Display(Name = "Duration (Years)")]
-		public int? DurationYears { get; set; }
+		// Duration field - represents months for internships, years for full-time
+		[Required(ErrorMessage = "Please enter duration.")]
+		[Range(1, int.MaxValue, ErrorMessage = "Duration must be greater than 0.")]
+		[Display(Name = "Duration")]
+		public int? Duration { get; set; }
 
         [Required(ErrorMessage = "Please select an application deadline")]
         [Display(Name = "Application Deadline")]
@@ -69,21 +63,21 @@ namespace PlacementManagementSystem.Models
         {
             if (Type == JobType.Internship)
             {
-                if (!DurationMonths.HasValue || DurationMonths.Value <= 0)
+                if (!Duration.HasValue || Duration.Value <= 0)
                 {
                     yield return new ValidationResult(
                         "Please enter duration in months for an internship.",
-                        new[] { nameof(DurationMonths) }
+                        new[] { nameof(Duration) }
                     );
                 }
             }
             else if (Type == JobType.FullTime)
             {
-                if (!DurationYears.HasValue || DurationYears.Value <= 0)
+                if (!Duration.HasValue || Duration.Value <= 0)
                 {
                     yield return new ValidationResult(
                         "Please enter duration in years for a full-time role.",
-                        new[] { nameof(DurationYears) }
+                        new[] { nameof(Duration) }
                     );
                 }
             }
