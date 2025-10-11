@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using PlacementManagementSystem.Models;
 using PlacementManagementSystem.Data;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 
@@ -21,96 +20,26 @@ namespace PlacementManagementSystem.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.ShowProfileBanner = false;
             var userId = _userManager.GetUserId(User);
             var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
-            if (user != null && user.UserType == UserType.Student)
+            
+            if (user != null)
             {
-                // Land students on Jobs by default
-                return RedirectToAction("Jobs", "Student");
-            }
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult Contact()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Contact(string name, string email, string subject, string message)
-        {
-            TempData["Success"] = "Thank you for contacting us. We'll get back to you soon.";
-            return RedirectToAction("Contact");
-        }
-
-        [HttpGet]
-        public IActionResult Feedback()
-        {
-            ViewBag.Companies = _db.Companies.Select(c => new { c.Id, c.CompanyName }).ToList();
-            return View(new Feedback());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Feedback(Feedback model)
-        {
-            ViewBag.Companies = _db.Companies.Select(c => new { c.Id, c.CompanyName }).ToList();
-
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var userId = _userManager.GetUserId(User);
-            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
-            if (user == null)
-            {
-                ModelState.AddModelError(string.Empty, "Please login to submit feedback.");
-                return View(model);
-            }
-
-            // Enforce role-based target
-            if (user.UserType == UserType.Student)
-            {
-                model.TargetType = FeedbackTargetType.Company;
-                if (model.TargetCompanyId == null)
+                switch (user.UserType)
                 {
-                    ModelState.AddModelError(nameof(model.TargetCompanyId), "Please select a company.");
-                    return View(model);
-                }
-                model.TargetCollegeName = null;
-            }
-            else if (user.UserType == UserType.Company)
-            {
-                model.TargetType = FeedbackTargetType.College;
-                model.TargetCompanyId = null;
-                if (string.IsNullOrWhiteSpace(model.TargetCollegeName))
-                {
-                    ModelState.AddModelError(nameof(model.TargetCollegeName), "Please enter the college name.");
-                    return View(model);
+                    case UserType.Student:
+                        return RedirectToAction("Jobs", "Student");
+                    case UserType.Company:
+                        return RedirectToAction("MyJobs", "Company");
+                    case UserType.College:
+                        return RedirectToAction("Students", "College");
                 }
             }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Only students and companies can submit feedback.");
-                return View(model);
-            }
-
-            model.AuthorUserId = user.Id;
-
-            _db.Feedbacks.Add(model);
-            _db.SaveChanges();
-            TempData["Success"] = "Feedback submitted successfully.";
-            return RedirectToAction("Feedback");
+            
+            // Show home page for unauthenticated users
+            return View();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
