@@ -39,6 +39,7 @@ namespace PlacementManagementSystem.Controllers
 				.Select(a => a.JobPostingId)
 				.Distinct()
 				.ToList();
+			// List of Announcements for jobs this student applied to and not rejected
 			var anns = _db.Announcements
 				.Where(a => eligibleJobIds.Contains(a.JobPostingId))
 				.Include(a => a.CompanyUser)
@@ -174,7 +175,9 @@ namespace PlacementManagementSystem.Controllers
 				return RedirectToAction("Jobs");
 			}
 
+			//Set automatically from logged-in user, not from form
 			ModelState.Remove("StudentUserId");
+			//Set from URL parameter, not from form input
 			ModelState.Remove("JobPostingId");
 			if (!model.TermsAccepted)
 			{

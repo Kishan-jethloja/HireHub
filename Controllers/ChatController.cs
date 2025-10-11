@@ -58,6 +58,7 @@ namespace PlacementManagementSystem.Controllers
                 return View(new List<ChatMessageViewModel>());
             }
 
+            // Get college name
             var collegeName = student.CollegeName;
             if (string.IsNullOrWhiteSpace(collegeName) || collegeName == "Unassigned")
             {
