@@ -15,34 +15,6 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Students</h2>
-    @if (ViewBag.ShowCollegeFilter == true)
-    {
-        <form method="get" class="form-inline">
-            <label class="mr-2">College</label>
-            <select name="college" class="form-control mr-2" onchange="this.form.submit()">
-                @if (string.IsNullOrEmpty((string)ViewBag.SelectedCollege))
-                {
-                    <option value="" selected>All</option>
-                }
-                else
-                {
-                    <option value="">All</option>
-                }
-                @foreach (var c in (IEnumerable<string>)ViewBag.Colleges)
-                {
-                    if ((string)ViewBag.SelectedCollege == c)
-                    {
-                        <option value="@c" selected>@c</option>
-                    }
-                    else
-                    {
-                        <option value="@c">@c</option>
-                    }
-                }
-            </select>
-            <noscript><button class="btn btn-primary" type="submit">Filter</button></noscript>
-        </form>
-    }
 </div>
 
 @if (!Model.Any())

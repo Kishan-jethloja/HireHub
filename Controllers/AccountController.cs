@@ -162,13 +162,8 @@ namespace PlacementManagementSystem.Controllers
 				}
 			}
 
-			// Debug: Log validation errors
 			if (!ModelState.IsValid)
 			{
-				foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-				{
-					System.Diagnostics.Debug.WriteLine($"Validation Error: {error.ErrorMessage}");
-				}
 				return View(model);
 			}
 

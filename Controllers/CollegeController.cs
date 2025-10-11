@@ -36,34 +36,25 @@ namespace PlacementManagementSystem.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Students(string college)
+		public IActionResult Students()
 		{
 			var user = GetCurrentUser();
-			if (user == null)
+			if (user == null || user.UserType != UserType.College)
 			{
 				return Forbid();
 			}
 
-			// Default filter to the logged-in college (if this account owns a college)
+			// Get the college that this user owns
 			var ownedCollege = _db.Colleges.FirstOrDefault(c => c.CollegeUserId == user.Id)?.Name;
-			var effectiveCollege = string.IsNullOrWhiteSpace(college) ? ownedCollege : college;
-            var query = _db.Students.AsQueryable();
-			if (!string.IsNullOrWhiteSpace(effectiveCollege))
+			if (string.IsNullOrWhiteSpace(ownedCollege))
 			{
-				query = query.Where(s => s.CollegeName == effectiveCollege);
+				TempData["Error"] = "Set up your college profile first.";
+				return RedirectToAction("Profile");
 			}
 
-			var distinctColleges = _db.Students
-				.Select(s => s.CollegeName)
-				.Distinct()
-				.OrderBy(n => n)
-				.ToList();
-
-			ViewBag.SelectedCollege = effectiveCollege ?? string.Empty;
-			ViewBag.Colleges = distinctColleges;
-			// Hide the filter for college accounts; admins can still use it
-			ViewBag.ShowCollegeFilter = user.UserType != UserType.College;
-			var students = query
+			// Only show students from this college
+			var students = _db.Students
+				.Where(s => s.CollegeName == ownedCollege)
 				.OrderBy(s => s.Department)
 				.ThenBy(s => s.StudentId)
 				.ToList();
@@ -213,25 +204,10 @@ namespace PlacementManagementSystem.Controllers
 				return View(model);
 			}
 			var college = _db.Colleges.FirstOrDefault(c => c.CollegeUserId == user.Id);
-			if (college == null)
-			{
-				college = new College
-				{
-					CollegeUserId = user.Id,
-					Name = model.Name,
-					WebsiteUrl = model.WebsiteUrl,
-					City = model.City,
-					State = model.State
-				};
-				_db.Colleges.Add(college);
-			}
-			else
-			{
-				college.Name = model.Name;
-				college.WebsiteUrl = model.WebsiteUrl;
-				college.City = model.City;
-				college.State = model.State;
-			}
+			college.Name = model.Name;
+			college.WebsiteUrl = model.WebsiteUrl;
+			college.City = model.City;
+			college.State = model.State;
 			_db.SaveChanges();
 			TempData["Success"] = "Profile updated.";
 			return RedirectToAction("Profile");
@@ -247,14 +223,8 @@ namespace PlacementManagementSystem.Controllers
 				return NotFound();
 			}
 			
-			// Debug: Log before approval
-			System.Diagnostics.Debug.WriteLine($"Before approval - Student ID: {student.Id}, IsApproved: {student.IsApproved}, CollegeName: {student.CollegeName}");
-			
 			student.IsApproved = true;
 			_db.SaveChanges();
-			
-			// Debug: Log after approval
-			System.Diagnostics.Debug.WriteLine($"After approval - Student ID: {student.Id}, IsApproved: {student.IsApproved}, CollegeName: {student.CollegeName}");
 			
 			TempData["Success"] = "Student approved successfully.";
 			return RedirectToAction("Students", new { college = student.CollegeName });
