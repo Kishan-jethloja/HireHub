@@ -101,12 +101,6 @@ namespace PlacementManagementSystem.Controllers
 				ModelState.Remove("LastName");
 				ModelState.Remove("CompanyName");
 			}
-
-			// Debug: Log model values
-			System.Diagnostics.Debug.WriteLine($"UserType: {model.UserType}");
-			System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
-			System.Diagnostics.Debug.WriteLine($"FirstName: {model.FirstName}");
-			System.Diagnostics.Debug.WriteLine($"LastName: {model.LastName}");
 			
 			// Check if UserType is selected
 			if (model.UserType == 0) // Default value means not selected
