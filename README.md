@@ -211,14 +211,6 @@ HireHub/
 3. **Register as a College**: Join the platform to manage students
 4. **Start Using**: Explore the platform based on your role
 
-## 👥 Team Members & Contributions
-
-| Name | Key Contributions |
-|------|------------------ |
-| **Ambaliya Jills** | Managed backend required for Hirehub |
-| **Kanani Tejasvini** | Managed Frontend required for HireHub |
-| **Kishan Jethloja** | Managed database required and Complete Testing |
----
 
 ### 💼 Collaboration Summary
 The team collaboratively planned, developed, and tested **HireHub** using Agile methodology. Each member contributed to both development and quality assurance phases, ensuring a stable and production-ready placement management system.
